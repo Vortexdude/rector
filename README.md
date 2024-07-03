@@ -1,0 +1,2 @@
+# rector
+Azure Resource Management
