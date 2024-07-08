@@ -10,7 +10,7 @@ router = APIRouter()
 upload_dir = settings.UPLOAD_DIR
 output_dir = settings.OUTPUT_DIR
 nural_net_model_path = settings.NURAL_NETWORK_STYLE_PATH
-models = get_models_list()
+models = get_models_list(f"{nural_net_model_path}/*/*")
 modelLiteral = Literal[tuple(models)]
 
 
