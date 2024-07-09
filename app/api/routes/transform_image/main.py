@@ -2,7 +2,7 @@ from fastapi import APIRouter, UploadFile, File
 from fastapi.responses import FileResponse
 from typing import Literal
 from app.core.utils import get_models_list
-from app.api.routes.engine import create_image
+from app.api.routes.transform_image.engine import create_image
 from app.core.config import settings
 
 
