@@ -4,7 +4,7 @@ from typing import Literal
 from app.core.utils import get_models_list
 from app.api.routes.transform_image.engine import create_image
 from app.core.config import settings
-
+from app.api.routes.auth.deps import user_dep
 
 router = APIRouter()
 upload_dir = settings.UPLOAD_DIR
@@ -15,13 +15,13 @@ modelLiteral = Literal[tuple(models)]
 
 
 @router.post("/upload_file/")
-async def create_file_upload(model: modelLiteral, file: UploadFile = File()):
+async def create_file_upload(user: user_dep, model: modelLiteral, file: UploadFile = File()):
     """Upload file for model manipulation"""
     try:
         with open(f"{upload_dir}/{file.filename}", 'wb') as f:
             while contents := file.file.read(1024 * 1024):
                 f.write(contents)
-    except Exception as e:
+    except FileNotFoundError:
         return {"message": "There was an error while uploading the image."}
     finally:
         file.file.close()

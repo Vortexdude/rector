@@ -1,72 +1,61 @@
+import bcrypt
 from app.api.models import User, Role, Group, Permission
 from .schema import UserRegisterSchema, RoleCreate, GroupCreate, PermissionCreate
-from sqlalchemy.orm import Session
-import bcrypt
+from app.core.db import ModelMixing
 
 
-class UserResource(object):
-    def __init__(self, session: Session):
-        self.db = session
+class UserResource(ModelMixing):
 
-    def insert(self, user: UserRegisterSchema) -> User | None:
+    def insert(self, user: UserRegisterSchema) -> User | dict:
         if self.find_by_email(user.email):
-            return
+            return {"message": "Username already registered"}
+
         password_hash = get_password_hash(user.password)
         user = User(
             username=user.username,
             password_hash=password_hash,
             email=user.email,
         )
-        self.db.add(user)
-        self.db.commit()
-        self.db.refresh(user)
+        self.add_to_db(user)
         return user
 
-    def find_by_email(self, email: str) -> User:
+    def find_by_email(self, email: str) -> User | dict:
         user = self.db.query(User).filter_by(email=email).first()
         return user if user else {}
 
-    def find_by_id(self, user_id: str) -> User:
-        user = self.db.query(User).filter_by(id=user_id).first()
+    def find_by_username(self, user_name: str) -> User | dict:
+        user = self.db.query(User).filter_by(username=user_name).first()
         return user if user else {}
 
 
-class RoleResource(object):
+class RoleResource(ModelMixing):
 
-    def __init__(self, session: Session):
-        self.db = session
-
-    def insert(self, role_data: RoleCreate) -> Role | None:
+    def insert(self, role_data: RoleCreate) -> Role | dict:
+        if self.find_by_name(Role, role_data.name):
+            return {"message": "Role already exist"}
         role = Role(**role_data.model_dump())
-        self.db.add(role)
-        self.db.commit()
-        self.db.refresh(role)
+        self.add_to_db(role)
         return role
 
 
-class GroupResource(object):
+class GroupResource(ModelMixing):
 
-    def __init__(self, session: Session):
-        self.db = session
-
-    def insert(self, group_data: GroupCreate) -> Role | None:
+    def insert(self, group_data: GroupCreate) -> Role | dict:
+        if self.find_by_name(Group, group_data.name):
+            return {"message": "Group already exist"}
         group = Group(**group_data.model_dump())
-        self.db.add(group)
-        self.db.commit()
-        self.db.refresh(group)
+        self.add_to_db(group)
         return group
 
 
-class PermissionResource(object):
+class PermissionResource(ModelMixing):
 
-    def __init__(self, session: Session):
-        self.db = session
+    def insert(self, perm_data: PermissionCreate) -> Role | dict:
+        if self.find_by_name(Permission, perm_data.name):
+            return {"message": "Permission already exist"}
 
-    def insert(self, perm_data: PermissionCreate) -> Role | None:
         permission = Permission(**perm_data.model_dump())
-        self.db.add(permission)
-        self.db.commit()
-        self.db.refresh(permission)
+        self.add_to_db(permission)
         return permission
 
 
