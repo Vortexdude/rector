@@ -1,32 +1,27 @@
-from fastapi import APIRouter, UploadFile, File
-from fastapi.responses import FileResponse
-from typing import Literal
-from app.core.utils import get_models_list
-from app.api.routes.transform_image.engine import create_image
-from app.core.config import settings
-from app.api.routes.auth.deps import user_dep
-
-router = APIRouter()
-upload_dir = settings.UPLOAD_DIR
-output_dir = settings.OUTPUT_DIR
-nural_net_model_path = settings.NURAL_NETWORK_STYLE_PATH
-models = get_models_list(f"{nural_net_model_path}/*/*")
-modelLiteral = Literal[tuple(models)]
+import imutils
+import cv2
 
 
-@router.post("/upload_file/")
-async def create_file_upload(user: user_dep, model: modelLiteral, file: UploadFile = File()):
-    """Upload file for model manipulation"""
-    try:
-        with open(f"{upload_dir}/{file.filename}", 'wb') as f:
-            while contents := file.file.read(1024 * 1024):
-                f.write(contents)
-    except FileNotFoundError:
-        return {"message": "There was an error while uploading the image."}
-    finally:
-        file.file.close()
-    model_path = f"{nural_net_model_path}/{model}"
-    input_image_path = f"{upload_dir}/{file.filename}"
-    output_image_path = f"{output_dir}/{model.split('/')[1].split('.')[0]}_{file.filename}"
-    create_image(model_path, _image=input_image_path, output_image=output_image_path)
-    return FileResponse(output_image_path)
+SCALE_FACTOR = 1.1
+MEAN = (103.939, 116.779, 123.680)
+swapRB = False
+crop = False
+
+
+def create_image(model, _image, output_image=None):
+
+    net = cv2.dnn.readNetFromTorch(model)
+    image = cv2.imread(_image)
+    image = imutils.resize(image, width=600)
+    (h, w) = image.shape[:2]
+    blob = cv2.dnn.blobFromImage(image, SCALE_FACTOR, (w, h), MEAN, swapRB=swapRB, crop=crop)
+    net.setInput(blob)
+    output = net.forward()
+    output = output.reshape((3, output.shape[2], output.shape[3]))
+    output[0] += MEAN[0]
+    output[1] += MEAN[1]
+    output[2] += MEAN[2]
+    # output /= 255.0
+    output = output.transpose(1, 2, 0)
+    cv2.imwrite(output_image, output)
+    return output_image

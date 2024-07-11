@@ -1,8 +1,27 @@
 import glob
-from typing import Literal
+from pathlib import Path
+import os
 
 
-def get_models_list(path) -> Literal[list[str]]:
-    _files = glob.glob(path)
-    files = ["/".join(file.split("models")[::-2]) for file in _files]
-    return files
+def home_dir() -> Path:
+    return Path(__file__).parent.parent
+
+
+def model_list(project_home_dir: Path = home_dir()) -> list:
+    models = []
+    models_path = os.path.join(project_home_dir, 'models')
+    model_files = glob.iglob(f"{models_path}/**/*.t7", recursive=True)
+    for file in model_files:
+        models.append("".join(file.split("/models/")[::-2]).rstrip(".t7").replace("/", "-"))
+    return models
+
+
+def upload_file(file, upload_dir):
+    try:
+        with open(f"{upload_dir}/{file.filename}", 'wb') as f:
+            while contents := file.file.read(1024 * 1024):
+                f.write(contents)
+    except Exception:
+        return {"message": "Error while uploading the file."}
+    finally:
+        file.file.close()
