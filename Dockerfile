@@ -1,5 +1,5 @@
 ARG dockerImage
-FROM --platform=linux/amd64  ${dockerImage}
+FROM ${dockerImage} AS base
 
 ARG projectHomeDirpath
 ENV PYTHONUNBUFFERED 1
@@ -7,14 +7,16 @@ ENV HOME=/app
 WORKDIR ${HOME}
 ENV PYTHONPATH=${HOME}
 
-COPY ./requirements.txt /requirements.txt
-RUN pip install -r /requirements.txt
-COPY ./app /app
+# add custemization
+FROM base AS layer1
+COPY requirements*.txt /
+RUN pip install --no-cache-dir -r /requirements-prd.txt
 
-RUN apt-get update && apt-get install ffmpeg libsm6 libxext6  -y
 
-COPY entrypoint.sh /entrypoint.sh
+COPY app ${HOME}
+
+COPY ./docker/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-ENTRYPOINT [ "/entrypoint.sh" ]
-CMD [ "tail", "-f", "/dev/null" ]
+ENTRYPOINT [ "/entrypoint.sh"]
+CMD [ "tail", "-f", "/dev/null"]

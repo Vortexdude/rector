@@ -1,8 +1,8 @@
 services:
   main:
-    container_name: rector
+    container_name: ${PROJECT_NAME}
     build:
-      context: .
+      context: ..
       dockerfile: Dockerfile
       args:
         projectHomeDirpath: ./
