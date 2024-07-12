@@ -23,6 +23,7 @@ MarkupSafe==2.1.5
 mdurl==0.1.2
 numpy==2.0.0
 opencv-python==4.10.0.84
+#opencv-python-headless==4.5.3.56
 orjson==3.10.6
 passlib==1.7.4
 pyasn1==0.6.0

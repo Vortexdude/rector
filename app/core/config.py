@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     UPLOAD_DIR: str = os.path.join(PROJECT_HOME_DIR, "uploads")
     OUTPUT_DIR: str = os.path.join(PROJECT_HOME_DIR, "outputs")
     JWT_SECRET_KEY: str = os.getenv('JWT_SECRET_KEY', '12jh5439ck3s04jt94dsfsdpdfprad344784')
-    ACTIVE_ROUTES: list = ['auth', 'transform_image']
+    ACTIVE_ROUTES: list = ['auth', 'transform_image', 'ssl_cert_util']
     MODEL_LIST: list = model_list()
 
 

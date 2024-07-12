@@ -19,7 +19,7 @@ modelLiteral = Literal[tuple(models)]
 @router.post("/upload_file/")
 def create_upload_file(model: modelLiteral, file: UploadFile = File()):
     upload_file(file, upload_dir)
-    model_base_path = f"{model.replace("-", '/')}.t7" if "-" in model else f"{model}.t7"
+    model_base_path = f"{model.replace('-', '/')}.t7" if "-" in model else f"{model}.t7"
     model_full_path = os.path.join(settings.NURAL_NETWORK_STYLE_PATH, model_base_path)
     input_file_path = f"{upload_dir}/{file.filename}"
     output_image_path = os.path.join(settings.OUTPUT_DIR, f"{model}_{file.filename}")

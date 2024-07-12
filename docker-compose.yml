@@ -1,0 +1,11 @@
+services:
+  main:
+    container_name: rector
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        projectHomeDirpath: ./
+        dockerImage: python:3.11-slim-bullseye
+    ports:
+      - "8000:8000"
