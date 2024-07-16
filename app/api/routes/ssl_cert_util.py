@@ -1,20 +1,40 @@
-from fastapi import APIRouter
+import requests
 import ssl
 import socket
 from datetime import datetime as dt
+from fastapi import APIRouter
+
 router = APIRouter()
 ssl_context = ssl.create_default_context()
 
 
 @router.get("/ssl_cert")
 def get_ssl_cert_details(domain: str):
-    url = validate_url(domain)
     try:
+        url = validate_url(domain)
+        response = requests.get(request_formatter(domain))
         detail = get_ssl_details(url)
+
+    except requests.exceptions.Timeout:
+        detail = {"status": "Timeout issue"}
+
+    except requests.exceptions.TooManyRedirects:
+        detail = {"status": "Too many redirection"}
+
+    except requests.exceptions.RequestException:
+        detail = {"status": "Error in the request."}
+
     except ValueError:
         detail = {"status": "Invalid URI"}
 
     return detail
+
+
+def request_formatter(url: str):
+
+    if not url.startswith("https"):
+        url = f"https://{url}"
+    return url
 
 
 def validate_url(url: str) -> str:

@@ -3,7 +3,7 @@ from typing import Literal
 from fastapi import APIRouter
 from app.core.config import settings
 from fastapi import UploadFile, File
-from app.core.utils import upload_file
+from app.common.utils.files import upload_file
 from .main import create_image
 from fastapi.responses import FileResponse
 

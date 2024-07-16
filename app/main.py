@@ -1,9 +1,13 @@
-from fastapi import FastAPI
-from app.core.config import settings
-from app.api import routes
+from pathlib import Path
+import uvicorn
+from app.core.register import register_app
 
-app = FastAPI(
-    title=settings.PROJECT_NAME,
-    openapi_url=f"{settings.API_V1_STR}/openapi.json"
-)
-app.include_router(routes.api_router)
+app = register_app()
+
+if __name__ == "__main__":
+    try:
+        config = uvicorn.Config(app=f"{Path(__file__).stem}:app", reload=True)
+        server = uvicorn.Server(config)
+        server.run()
+    except Exception as e:
+        raise e

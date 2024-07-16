@@ -1,3 +1,3 @@
 #!/bin/bash
 
-fastapi run /app/main.py >/app/app.log
+fastapi run app/main.py >app/app.log

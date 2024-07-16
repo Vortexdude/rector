@@ -1,18 +1,13 @@
 import glob
-from pathlib import Path
 import os
 
 
-def home_dir() -> Path:
-    return Path(__file__).parent.parent
-
-
-def model_list(project_home_dir: Path = home_dir()) -> list:
+def model_list(project_home_dir) -> list:
     models = []
     models_path = os.path.join(project_home_dir, 'models')
     model_files = glob.iglob(f"{models_path}/**/*.t7", recursive=True)
     for file in model_files:
-        models.append("".join(file.split("/models/")[::-2]).rstrip(".t7").replace("/", "-"))
+        models.append("".join(file.split("/models/")[::-2]).rstrip("t7").rstrip(".").replace("/", "-"))
     return models
 
 
