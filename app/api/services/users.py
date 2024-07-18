@@ -1,7 +1,11 @@
+from datetime import timedelta
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import SQLAlchemyError
 from app.api.models.users import User
-from app.common.security.jwt import get_password_hash, verify_password
-from app.common.security.jwt import create_access_token
+from app.common.security.jwt_util import get_password_hash, verify_password, create_access_token
+from app.common.security.exceptions import credentials_exception
+from app.core.config import settings
+from app.api.models.jwt import Token
 
 
 class UserService:
@@ -19,33 +23,25 @@ class UserService:
             self.db.commit()
             self.db.flush(user)
             return {"status": "done"}
-        except Exception as e:
+        except SQLAlchemyError as e:
             print(e)
-            return {"error": "Exception with the database later will change"}
+            return {"error": "User Already exists"}
 
-    def _get_user(self, data):
-        args = {}
-        if data.email:
-            args['email'] = data.email
+    def get_by_email(self, email):
+        return self.db.query(User).filter_by(email=email).first()
 
-        user = self.db.query(User).filter_by(**args).first()
+    def authenticate_user(self, data):
+        user = self.get_by_email(email=data.email)
         if not user:
-            return {}
+            return False
+        if not verify_password(data.password, user.hashed_password):
+            return False
         return user
 
-    def login(self, data):
-        user = self._get_user(data)
-
+    def login(self, form_data) -> Token:
+        user = self.get_by_email(email=form_data.email)
         if not user:
-            return {"message": "User not found"}
-        if not verify_password(data.password, user.hashed_password):
-            return {"message": "email or password not matched."}
-        if not isinstance(user, User):
-            return {"Message": "Error with the database"}
-
-        token, expire = create_access_token(sub=user.email)
-        return {
-            "access_token": token,
-            "time": str(expire)
-        }
-
+            raise credentials_exception
+        access_token_expire = timedelta(minutes=settings.TOKEN_EXPIRE_SECONDS)
+        access_token = create_access_token(data={'sub': user.name}, expire_delta=access_token_expire)
+        return Token(access_token=access_token, token_type='bearer')

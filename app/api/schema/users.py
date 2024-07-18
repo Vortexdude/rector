@@ -2,8 +2,8 @@ from pydantic import BaseModel, EmailStr, Field, field_validator
 
 
 class UserLoginSchema(BaseModel):
-    email: str
-    password: str
+    email: str = 'user@example.com'
+    password: str = "$348789asd86745d6s34a36f75s"
 
 
 class UserBase(BaseModel):

@@ -9,6 +9,9 @@ ENV PYTHONPATH=/home
 
 # add custemization
 FROM base AS layer1
+RUN apt-get update -y &&\
+    apt-get install libpq-dev python-dev gcc -y
+
 COPY requirements*.txt /
 RUN pip install --no-cache-dir -r /requirements-prd.txt
 

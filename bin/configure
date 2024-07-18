@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # get the linux version
 source /etc/os-release 2>/dev/null
@@ -43,4 +43,10 @@ function prepare-system() {
     sudo apt-get update -y
 }
 
-main
+#main
+set -a
+source "${PWD}/app/.env"
+export PYTHONPATH=${PWD}
+set +a
+env | grep POSTGRES_*
+python3 app/main.py
