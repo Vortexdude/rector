@@ -3,7 +3,7 @@ services:
     container_name: ${PROJECT_NAME}
     build:
       context: ..
-      dockerfile: Dockerfile
+      dockerfile: ./docker/Dockerfile
       args:
         projectHomeDirpath: ./
         dockerImage: python:3.11-slim-bullseye

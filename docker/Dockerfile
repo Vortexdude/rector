@@ -15,10 +15,9 @@ RUN apt-get update -y &&\
 COPY requirements*.txt /
 RUN pip install --no-cache-dir -r /requirements-prd.txt
 
-
 COPY ./app ${HOME}
 
-COPY ./docker/entrypoint.sh /entrypoint.sh
+COPY ./bin/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 ENTRYPOINT [ "/entrypoint.sh"]
