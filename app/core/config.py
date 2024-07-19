@@ -3,6 +3,7 @@ import os
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from app.common.utils.files import model_list
 from .pathconf import BasePath, SQLITE_DATABASE_FILE
+from app.common.utils.log import Logger
 
 
 class PSQL:
@@ -49,3 +50,8 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+logger_namespace = os.path.basename(BasePath.parent)
+log_init = Logger('debug', logger_namespace=logger_namespace)
+logger = log_init.get_logger()
+logger.debug("logger initialize")
+logger.debug("config loaded from environment")
