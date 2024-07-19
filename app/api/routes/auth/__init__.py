@@ -1,17 +1,17 @@
 from fastapi import APIRouter, Body
 from app.core.db import db_dependency
-from app.api.schema.users import UserCreateSchema
+from app.api.schema.users import UserCreateSchema, UserLoginSchema, UserBase
 from app.api.services.users import UserService
 from app.api.models.jwt import Token
-from app.common.security.depends import pwd_request_form
-from app.common.security.jwt_util import current_user
+from app.common.security.depends import user_identity_dependency
 
-router = APIRouter()
+
+router = APIRouter(prefix='/api/v1')
 
 
 @router.get("/me")
-def read_own_items(user: current_user):
-    return [{"item_id": "Foo", "owner": user.email}]
+def read_own_items(db: db_dependency, user: user_identity_dependency) -> UserBase:
+    return UserService(db).current_user(user.email)
 
 
 @router.post("/signup")
@@ -20,15 +20,5 @@ def user_register(db: db_dependency, data: UserCreateSchema = Body()):
 
 
 @router.post("/login")
-async def login_for_access_token(db: db_dependency, form_data: pwd_request_form) -> Token:
-    """Processes user's authentication and returns a token
-    on successful authentication.
-
-    request body:
-
-    - email: Unique identifier for a user 'e.g' email,
-                phone number, name
-
-    - password:
-    """
+async def login_for_access_token(db: db_dependency, form_data: UserLoginSchema) -> Token:
     return UserService(db).login(form_data)

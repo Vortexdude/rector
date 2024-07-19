@@ -7,6 +7,7 @@ from app.core.db import Base, engine
 
 def register_app():
     register_db()
+    register_logger()
 
     app = FastAPI(
         title=settings.PROJECT_NAME,
@@ -27,8 +28,8 @@ def register_app():
 def register_logger() -> None:
     # adding the passlib logger to get rid of the warning about the version of bcrypt
     # https://github.com/pyca/bcrypt/issues/684#issuecomment-1858400267
-    logging.getLogger('passlib').setLevel(logging.ERROR)
-
+    from app.common.utils.log import logger
+    logger.info("Stating the app")
 
 def register_middleware() -> None:
     pass

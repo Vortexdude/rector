@@ -1,5 +1,5 @@
 from uuid import uuid4
-from sqlalchemy import String, Boolean, UniqueConstraint, PrimaryKeyConstraint
+from sqlalchemy import String, Boolean
 from sqlalchemy.orm import mapped_column, Mapped
 from passlib.context import CryptContext
 from . import Base
