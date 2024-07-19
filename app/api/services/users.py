@@ -24,7 +24,6 @@ class UserService:
             self.db.flush(user)
             return {"status": "done"}
         except SQLAlchemyError as e:
-            print(e)
             return {"error": "User Already exists"}
 
     def get_by_email(self, email):

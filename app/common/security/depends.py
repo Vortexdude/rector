@@ -1,13 +1,13 @@
 from typing import Annotated, Optional
 from fastapi import Depends
-from fastapi.param_functions import Form
-from typing_extensions import Doc
 from fastapi.security import OAuth2
+from fastapi.exceptions import HTTPException
+from fastapi.param_functions import Form
 from fastapi.openapi.models import OAuthFlows as OAuthFlowsModel
-from starlette.requests import Request
 from fastapi.security.utils import get_authorization_scheme_param
 from starlette.status import HTTP_401_UNAUTHORIZED
-from fastapi.exceptions import HTTPException
+from typing_extensions import Doc
+from starlette.requests import Request
 from .jwt_util import login_required
 
 

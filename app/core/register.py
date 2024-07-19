@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from app.api import routes
-from app.core.config import settings
+from app.core.config import settings, logger
 from app.core.db import Base, engine
 
 
@@ -15,7 +15,7 @@ def register_app():
         docs_url=settings.DOCS_URL,
         redoc_url=settings.REDOCS_URL,
     )
-
+    app.logger = logger
     register_logger()
     register_middleware()
     register_routes(app)

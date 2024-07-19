@@ -1,4 +1,16 @@
 import logging
+from typing import Dict, Any
+
+
+def timestamp_log_config(uvicorn_log_config: Dict[str, Any]) -> Dict[str, Any]:
+    datefmt = '%d-%m-%Y %H:%M:%S'
+    formatters = uvicorn_log_config['formatters']
+    formatters['default']['fmt'] = '%(levelprefix)s [%(asctime)s] %(message)s'
+    formatters['access']['fmt'] = '%(levelprefix)s [%(asctime)s] %(client_addr)s - "%(request_line)s" %(status_code)s'
+    formatters['access']['datefmt'] = datefmt
+    formatters['default']['datefmt'] = datefmt
+    return uvicorn_log_config
+
 
 
 class CustomFormatter(logging.Formatter):
@@ -56,3 +68,4 @@ class Logger:
 
     def get_logger(self):
         return self.logger
+
