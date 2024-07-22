@@ -1,14 +1,9 @@
 from uuid import uuid4
 from sqlalchemy import String, Boolean
 from sqlalchemy.orm import mapped_column, Mapped
-from passlib.context import CryptContext
-from . import Base
-from app.core.config import settings
+from app.core.db import Base
 
-
-bcrypt_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
-ALGORITHM = 'HS256'
-SECRETKEY = settings.JWT_SECRET_KEY
+__all__ = ["User"]
 
 
 class SurrogatePK(Base):

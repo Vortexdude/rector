@@ -1,5 +1,7 @@
 from pydantic import BaseModel, EmailStr, Field, field_validator
 
+__all__ = ["UserLoginSchema", "UserCreateSchema", "UserBase"]
+
 
 class UserLoginSchema(BaseModel):
     email: str = 'user@example.com'

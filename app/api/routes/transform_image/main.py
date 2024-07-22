@@ -1,6 +1,8 @@
 import imutils
 import cv2
 
+__all__ = ["create_image"]
+
 
 SCALE_FACTOR = 1.1
 MEAN = (103.939, 116.779, 123.680)

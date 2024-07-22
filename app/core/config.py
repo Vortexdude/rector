@@ -5,6 +5,8 @@ from app.common.utils.files import model_list
 from .pathconf import BasePath, SQLITE_DATABASE_FILE
 from app.common.utils.log import Logger
 
+__all__ = ["settings", "logger"]
+
 
 class PSQL:
     @property
