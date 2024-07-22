@@ -15,7 +15,7 @@ def model_list(project_home_dir) -> list:
 
 def upload_file(file, upload_dir):
     try:
-        with open(f"{upload_dir}/{file.input_file_name}", 'wb') as f:
+        with open(f"{upload_dir}/{file.filename}", 'wb') as f:
             while contents := file.file.read(1024 * 1024):
                 f.write(contents)
     except Exception:
