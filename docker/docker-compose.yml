@@ -11,6 +11,8 @@ services:
       - "8000:8000"
     environment:
       POSTGRES_HOST: db
+    networks:
+      database: {}
   db:
     container_name: ${PROJECT_NAME}-DB
     image: postgres:12-bullseye
@@ -25,7 +27,13 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      database: {}
 
 volumes:
   postgres_data:
     external: false
+
+networks:
+  database:
+    external: true
