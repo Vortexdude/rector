@@ -5,7 +5,7 @@ from fastapi import Request
 from datetime import timedelta
 from .exceptions import credentials_exception
 from app.common.utils.timezone import timezone
-from app.core.config import settings
+from app.core.config import settings, logger
 from app.api.models.jwt import TokenData
 from app.core.db import get_db
 from app.api.models.users import User
@@ -74,10 +74,12 @@ def get_current_user(token) -> User:
 def login_required(request: Request) -> User:
     """Whenever you this as the dependency it required the authorization headers in the request"""
     if 'Authorization' not in request.headers:
+        logger.error(f"Token Header is missing from the request")
         raise credentials_exception
 
     scheme, token = request.headers['Authorization'].split(" ")
     if scheme.lower() != 'bearer':
+        logger.error(f"Token type not matched")
         raise credentials_exception
 
     user = get_current_user(token)
