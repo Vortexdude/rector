@@ -1,0 +1,25 @@
+#!/bin/bash
+ACTION=$1
+CURDIR=$(cd $(dirname $0) && pwd)
+export PROJECT_HOME=$(cd "$CURDIR/../" && pwd)
+project_name=$(basename $PROJECT_HOME)
+export PROJECT_NAME="${project_name^}"
+DOCKER_COMPOSE_FILE="${PROJECT_HOME}/docker/docker-compose.yml"
+DOCKER_COMPOSE_OVERWRITE="${PROJECT_HOME}/docker/docker-compose-overwrite.yml"
+
+
+case $ACTION in
+    "apply")
+        echo "Starting continuous integration . . . "
+        docker compose -f $DOCKER_COMPOSE_FILE -f $DOCKER_COMPOSE_OVERWRITE\
+        up --remove-orphans --build -d
+    ;;
+    "stop")
+        echo "Destroying ..."
+        docker compose -f $DOCKER_COMPOSE_FILE -f $DOCKER_COMPOSE_OVERWRITE\
+        down --remove-orphans
+    ;;
+    *)
+        echo "Other args"
+    ;;
+esac

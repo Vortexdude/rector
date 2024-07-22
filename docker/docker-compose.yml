@@ -1,0 +1,39 @@
+services:
+  main:
+    container_name: ${PROJECT_NAME}
+    build:
+      context: ..
+      dockerfile: ./docker/Dockerfile
+      args:
+        projectHomeDirpath: ./
+        dockerImage: python:3.11-slim-bullseye
+    ports:
+      - "8000:8000"
+    environment:
+      POSTGRES_HOST: db
+    networks:
+      database: {}
+  db:
+    container_name: ${PROJECT_NAME}-DB
+    image: postgres:12-bullseye
+    ports:
+      - "5432:5432"
+    env_file:
+      - ./../app/.env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rector"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      database: {}
+
+volumes:
+  postgres_data:
+    external: false
+
+networks:
+  database:
+    external: true

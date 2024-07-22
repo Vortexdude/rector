@@ -1,13 +1,22 @@
-from fastapi import FastAPI
+from pathlib import Path
+import uvicorn
+from app.core.register import register_app
 from app.core.config import settings
-from app.api import api_router
-from app.api import models
-from app.core.db import engine
+from app.common.utils.log import timestamp_log_config
 
+app = register_app()
 
-app = FastAPI(
-    title=settings.PROJECT_NAME,
-    openapi_url=f"{settings.API_V1_STR}/openapi.json"
-)
-models.Base.metadata.create_all(bind=engine)
-app.include_router(api_router)
+if __name__ == "__main__":
+    try:
+        config = uvicorn.Config(
+            app=f"{Path(__file__).stem}:app",
+            host=settings.SERVER_HOST,
+            port=settings.SERVER_PORT,
+            reload=True,
+            reload_dirs=[str(Path(__file__).parent)],
+            log_config=timestamp_log_config(uvicorn.config.LOGGING_CONFIG)
+        )
+        server = uvicorn.Server(config)
+        server.run()
+    except Exception as e:
+        raise e
