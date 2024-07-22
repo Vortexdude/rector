@@ -7,6 +7,8 @@ from app.core.config import settings
 from app.api.models.jwt import Token
 from app.api.models.users import User
 
+__all__ = ["UserService"]
+
 
 class UserService:
     def __init__(self, db: Session):

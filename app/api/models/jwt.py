@@ -1,5 +1,7 @@
 from pydantic import BaseModel, EmailStr
 
+__all__ = ["Token", "TokenData"]
+
 
 class Token(BaseModel):
     access_token: str

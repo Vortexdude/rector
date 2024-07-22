@@ -1,6 +1,8 @@
 import glob
 import os
 
+__all__ = ["upload_file", "model_list"]
+
 
 def model_list(project_home_dir) -> list:
     models = []

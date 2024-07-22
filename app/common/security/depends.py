@@ -10,6 +10,8 @@ from typing_extensions import Doc
 from starlette.requests import Request
 from .jwt_util import login_required
 
+__all__ = ["user_identity_dependency"]
+
 
 class OpenapiLogin:
     def __init__(

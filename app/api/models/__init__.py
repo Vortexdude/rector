@@ -1,1 +1,2 @@
-from app.core.db import Base
+from .users import User
+from .jwt import Token, TokenData

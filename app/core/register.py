@@ -3,6 +3,8 @@ from app.api import routes
 from app.core.config import settings, logger
 from app.core.db import Base, engine
 
+__all__ = ["register_app"]
+
 
 def register_app():
     register_db()
@@ -36,7 +38,7 @@ def register_middleware() -> None:
 
 
 def register_routes(app) -> None:
-    app.include_router(routes.api_router)
+    app.include_router(prefix=settings.API_V1_STR, router=routes.api_router)
 
 
 def register_exceptions() -> None:
