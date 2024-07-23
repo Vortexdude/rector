@@ -1,7 +1,6 @@
 from __future__ import annotations
 import os
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from app.common.utils.files import model_list
 from .pathconf import BasePath, SQLITE_DATABASE_FILE
 from app.common.utils.log import Logger
 
@@ -42,8 +41,7 @@ class Settings(BaseSettings):
     OUTPUT_DIR: str = os.path.join(BasePath, "outputs")
     JWT_SECRET_KEY: str = os.getenv('JWT_SECRET_KEY', '12jh5439ck3s04jt94dsfsdpdfprad344784')
     TOKEN_ALGORITHM: str = 'HS256'
-    ACTIVE_ROUTES: list = ['auth', 'transform_image', 'ssl_cert_util']
-    MODEL_LIST: list = model_list(BasePath)
+    ACTIVE_ROUTES: list = ['auth', 'transform_image', 'ssl_cert_util', 'video_transcoding']
 
     # DateTime
     DATETIME_TIMEZONE: str = 'Asia/Kolkata'
