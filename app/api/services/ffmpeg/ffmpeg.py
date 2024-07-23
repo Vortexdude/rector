@@ -2,8 +2,9 @@ from pathlib import Path
 
 
 class BaseFFMpeg:
-    def __init__(self):
-        self.cmd = ["ffmpeg"]
+    def __init__(self, force=True):
+        self.force: bool = force
+        self.cmd = ['ffmpeg']
         self._a_codec_name: str = ""
         self._v_codec_name: str = ""
         self.a_codecs: list = ["libshine", ]
@@ -33,6 +34,7 @@ class BaseFFMpeg:
             value = Path(value)
 
         self._validator(value, exists=False)
+        print(f"{value}")
         self._output_file_name = value
 
     @staticmethod
