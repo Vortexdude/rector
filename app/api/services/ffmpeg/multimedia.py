@@ -31,6 +31,9 @@ class Multiplexer(BaseFFMpeg):
         self.cmd.append(outfile)
 
     def run(self):
+        #  check for cmd has the file added at the end of the command using extension
+        if self.output_file_name and not any(ext in self.cmd[-1] for ext in self.VIDEO_EXTENSIONS):
+            self.cmd.append(str(self.output_file_name))
         result = subprocess.run(self.cmd, capture_output=True, text=True)
         print(result.stdout)
         print(result.stderr)

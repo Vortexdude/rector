@@ -2,6 +2,9 @@ from pathlib import Path
 
 
 class BaseFFMpeg:
+    AUDIO_EXTENSIONS = ['.mp3', '.wav']
+    VIDEO_EXTENSIONS = ['.mp4', '.mov', '.flv', '.avi']
+
     def __init__(self, force=True):
         self.force: bool = force
         self.cmd = ['ffmpeg']
@@ -34,7 +37,6 @@ class BaseFFMpeg:
             value = Path(value)
 
         self._validator(value, exists=False)
-        print(f"{value}")
         self._output_file_name = value
 
     @staticmethod
@@ -46,8 +48,8 @@ class BaseFFMpeg:
         if file.is_file() and not exists:
             raise Exception(f"output {file} already exists")
 
-    def audio_codec(self, name):
-        self._a_codec_name = name
+    def reverse_video(self):
+        self.cmd.extend(['-vf', 'reverse'])
 
-    def video_codec(self, name):
-        self._v_codec_name = name
+    def reverse_audio(self):
+        self.cmd.extend(['-af', 'areverse'])

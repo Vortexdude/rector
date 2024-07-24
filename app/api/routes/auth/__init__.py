@@ -3,7 +3,7 @@ from app.core.config import logger
 from app.core.db import db_dependency
 from app.api.schema import UserCreateSchema, UserLoginSchema, UserBase
 from app.api.services import UserService
-from app.api.models.jwt import Token
+from app.api.models import Token
 from app.common.security import user_identity_dependency
 
 
