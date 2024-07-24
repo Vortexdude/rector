@@ -1,3 +1,4 @@
+from os import path, remove
 import subprocess
 from concurrent.futures import ProcessPoolExecutor
 from app.api.services.ffmpeg import resolutions
@@ -7,18 +8,32 @@ from app.api.services.ffmpeg.models import RESOLUTION_MAPPING
 
 class Multiplexer(BaseFFMpeg):
 
-    def __init__(self):
+    def __init__(self, debug=False):
+        self.debug: bool = debug
         super().__init__()
+        if not self.debug:
+            self.cmd.extend(["-loglevel", "quiet"])
 
     def scale(self, resolution):
         self.cmd.append("-vf")
         width = resolution.width
         height = resolution.height
         self.cmd.append(f"scale={width}:{height}")
-        outfile = self.output_file_name.stem + f"{width}x{height}.mp4"
+        if self.output_file_name:
+            file_path, _ = path.splitext(str(self.output_file_name.resolve()))
+        else:
+            file_path, _ = path.splitext(str(self.input_file_name.resolve()))
+
+        outfile = file_path + f"_{width}x{height}.mp4"
+        if path.exists(outfile) and self.force:
+            remove(outfile)
+
         self.cmd.append(outfile)
 
     def run(self):
+        #  check for cmd has the file added at the end of the command using extension
+        if self.output_file_name and not any(ext in self.cmd[-1] for ext in self.VIDEO_EXTENSIONS):
+            self.cmd.append(str(self.output_file_name))
         result = subprocess.run(self.cmd, capture_output=True, text=True)
         print(result.stdout)
         print(result.stderr)
@@ -41,10 +56,3 @@ class Multiplexer(BaseFFMpeg):
                 future.result()
 
             print("completed processing")
-
-
-mm = Multiplexer()
-mm.input_file_name = "/home/ncs/Downloads/ffm/video1.mp4"
-mm.output_file_name = "/home/ncs/Downloads/ffm/video_out.mp4"
-res_list = ["sd", 'hd']
-mm.transcode(res_list)

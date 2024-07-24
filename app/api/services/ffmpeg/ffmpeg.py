@@ -2,8 +2,12 @@ from pathlib import Path
 
 
 class BaseFFMpeg:
-    def __init__(self):
-        self.cmd = ["ffmpeg"]
+    AUDIO_EXTENSIONS = ['.mp3', '.wav']
+    VIDEO_EXTENSIONS = ['.mp4', '.mov', '.flv', '.avi']
+
+    def __init__(self, force=True):
+        self.force: bool = force
+        self.cmd = ['ffmpeg']
         self._a_codec_name: str = ""
         self._v_codec_name: str = ""
         self.a_codecs: list = ["libshine", ]
@@ -44,8 +48,8 @@ class BaseFFMpeg:
         if file.is_file() and not exists:
             raise Exception(f"output {file} already exists")
 
-    def audio_codec(self, name):
-        self._a_codec_name = name
+    def reverse_video(self):
+        self.cmd.extend(['-vf', 'reverse'])
 
-    def video_codec(self, name):
-        self._v_codec_name = name
+    def reverse_audio(self):
+        self.cmd.extend(['-af', 'areverse'])
