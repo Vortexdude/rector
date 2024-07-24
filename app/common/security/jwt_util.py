@@ -1,5 +1,5 @@
 import jwt
-from jwt.exceptions import InvalidTokenError
+from jwt.exceptions import InvalidTokenError, ExpiredSignatureError
 from passlib.context import CryptContext
 from fastapi import Request
 from datetime import timedelta
@@ -9,6 +9,8 @@ from app.core.config import settings, logger
 from app.api.models.jwt import TokenData
 from app.core.db import get_db
 from app.api.models.users import User
+from app.common.exceptions.errors import TokenError
+from sqlalchemy.orm import Session
 
 __all__ = ["JWTUtil", "get_current_user", "login_required"]
 
@@ -50,6 +52,26 @@ class JWTUtil:
         to_encode.update({'exp': expire, **kwargs})
         token = jwt.encode(to_encode, settings.JWT_SECRET_KEY, settings.TOKEN_ALGORITHM)
         return token
+
+    @staticmethod
+    def decode_token(token: str) -> str:
+        try:
+            payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=[settings.TOKEN_ALGORITHM])
+            user_email = payload.get('sub')
+            if not user_email:
+                raise TokenError(msg="Invalid Token")
+
+        except ExpiredSignatureError:
+            raise TokenError(msg='Token Expired')
+        except (jwt.PyJWTError, Exception):
+            raise TokenError(msg="Invalid Token")
+
+        return user_email
+
+    @staticmethod
+    def get_user_by_email(email):
+        db = next(get_db())
+        return db.query(User).filter_by(email=email).first()
 
 
 def get_current_user(token) -> User:
