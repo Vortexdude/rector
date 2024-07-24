@@ -48,6 +48,9 @@ class Settings(BaseSettings):
     DATETIME_FORMAT: str = '%Y-%m-%d %H:%M:%S'
     TOKEN_EXPIRE_SECONDS: int = 900  # 15 minutes
 
+    # middleware
+    API_REQUEST_PER_MINUTE: int = 5
+
 
 settings = Settings()
 logger_namespace = os.path.basename(BasePath.parent)
