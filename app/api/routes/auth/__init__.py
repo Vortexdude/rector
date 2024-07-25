@@ -1,17 +1,16 @@
 from fastapi import APIRouter, Body
 from app.core.db import db_dependency
-from app.api.schema import UserCreateSchema, UserLoginSchema, UserBase
+from app.api.schema import UserCreateSchema, UserLoginSchema
 from app.api.services import UserService
 from app.api.models import Token
-from app.common.security import user_identity_dependency
-
+from starlette.requests import Request
 
 router = APIRouter()
 
 
 @router.get("/me")
-def read_own_items(db: db_dependency, user: user_identity_dependency) -> UserBase:
-    return UserService(db).current_user(user.email)
+def read_own_items(db: db_dependency, request: Request):
+    return {"status": "done"}
 
 
 @router.post("/signup")
