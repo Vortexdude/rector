@@ -1,28 +1,26 @@
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
-from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 from starlette.requests import Request
 from starlette.responses import Response
+from .common import Middleware
 from app.common.utils.timezone import timezone
 from app.core.config import settings, logger
 
 __all__ = ["RateLimitMiddleware"]
 
 
-class RateLimitMiddleware(BaseHTTPMiddleware):
+class RateLimitMiddleware(Middleware):
 
     # Rate limiting configurations
     RATE_LIMIT_DURATION = timezone.timedelta(minutes=1)
     RATE_LIMIT_REQUEST = settings.API_REQUEST_PER_MINUTE
 
     def __init__(self, app: FastAPI):
-        logger.info(f"Start {self.__class__.__name__}")
         super().__init__(app)
-
         # Dictionary to store request counts for each IP
         self.request_count = {}
 
-    async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
+    async def dispatch(self, request: Request, call_next) -> Response:
         # Get the client's IP address
         _client_ip = request.client.host
         # Check if IP is already present in request_counts

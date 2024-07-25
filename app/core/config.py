@@ -65,6 +65,7 @@ class Settings(BaseSettings):
         f'{API_V1_STR}/docs',
         f'{API_V1_STR}/redocs',
         f'{API_V1_STR}/openapi'
+        f'{API_V1_STR}/signup'
     ]
 
 

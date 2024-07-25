@@ -1,19 +1,18 @@
 from sqlalchemy.orm import Session
-from app.api.models import ActivityLog
-from app.common.utils.timezone import timezone
+from app.api.models import Guardian
+from app.core.db import get_db
+# from app.common.utils.timezone import timezone
+
+__all__ = ["UserActivity"]
 
 
 class UserActivity:
-    def __init__(self, db):
-        self.db: Session = db
+    def __init__(self, db: Session = next(get_db())):
+        self.db = db
 
-    def set_info(self, user, activity: str):
+    def set_info(self, *args, **kwargs):
 
-        log = ActivityLog(
-            user_id=user.id,
-            activity=activity,
-            timestamp=timezone.now()
-        )
-        self.db.add(log)
+        record = Guardian(*args, **kwargs)
+        self.db.add(record)
         self.db.commit()
-        self.db.flush(log)
+        self.db.flush(record)

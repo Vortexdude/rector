@@ -1,12 +1,13 @@
-from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 from starlette.requests import Request
 from starlette.responses import Response
+from .common import Middleware
 from app.common.utils.timezone import timezone
 from app.core.config import logger
 
 
-class DispatchMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
+class DispatchMiddleware(Middleware):
+
+    async def dispatch(self, request: Request, call_next) -> Response:
         start_time = timezone.now()
         response = await call_next(request)
         end_time = timezone.now()

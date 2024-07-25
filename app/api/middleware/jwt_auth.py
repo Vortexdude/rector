@@ -1,13 +1,13 @@
 from typing import Any
-from starlette.authentication import AuthenticationBackend
 from fastapi import Request, Response
+from starlette.authentication import AuthenticationBackend
 from app.core.config import logger, settings
 from app.common.security.jwt_util import JWTUtil
 from app.common.exceptions.errors import TokenError
 from app.common.responses.main import StandardResponseCode
 from starlette.authentication import AuthenticationError, AuthCredentials, SimpleUser
-from starlette.requests import HTTPConnection
 from app.common.encodes.msgspec import MsgSpecJsonResponse
+from starlette.requests import HTTPConnection
 
 
 class _AuthenticateError(AuthenticationError):
@@ -60,4 +60,4 @@ class JWTAuthMiddleware(AuthenticationBackend):
             raise _AuthenticateError(code=getattr(e, 'code', 500), msg=getattr(e, 'msg', 'Internal Server Error'))
 
         # more https://www.starlette.io/authentication
-        return AuthCredentials(['authenticated']), SimpleUser(user)
+        return AuthCredentials(['authenticated']), user
