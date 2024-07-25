@@ -29,6 +29,7 @@ class Settings(BaseSettings):
     SERVER_HOST: str = os.getenv('SERVER_HOST', "0.0.0.0")
     SERVER_PORT: int = os.getenv('SERVER_PORT', 8000)
     DOMAIN: str = os.getenv('DOMAIN', "localhost")
+    ENV: str = os.getenv("ENV", "dev")
     PROJECT_NAME: str = os.getenv('PROJECT_NAME', 'Rector')
     API_V1_STR: str = os.getenv('API_V1_STR', "/api/v1")
     DOCS_URL: str = os.getenv('DOCS_URL', f'{API_V1_STR}/docs')
@@ -36,12 +37,19 @@ class Settings(BaseSettings):
     OPENAPI_URL: str = os.getenv('OPENAPI_URL', f'{API_V1_STR}/openapi')
     DESCRIPTION: str = os.getenv('DESCRIPTION', 'FastAPI Best Architecture')
     SQLALCHEMY_DATABASE_URL: str = PSQL().uri
+
+    # filepaths
     NURAL_NETWORK_STYLE_PATH: str = os.path.join(BasePath, "models")
     UPLOAD_DIR: str = os.path.join(BasePath, "uploads")
     OUTPUT_DIR: str = os.path.join(BasePath, "outputs")
+
+    # JWT Config
     JWT_SECRET_KEY: str = os.getenv('JWT_SECRET_KEY', '12jh5439ck3s04jt94dsfsdpdfprad344784')
     TOKEN_ALGORITHM: str = 'HS256'
     ACTIVE_ROUTES: list = ['auth', 'transform_image', 'ssl_cert_util', 'video_transcoding']
+
+    # logging
+    LOGFILE_PATH: str = os.path.join(BasePath, "log")
 
     # DateTime
     DATETIME_TIMEZONE: str = 'Asia/Kolkata'
@@ -51,8 +59,16 @@ class Settings(BaseSettings):
     # middleware
     API_REQUEST_PER_MINUTE: int = 5
 
+    # routes
+    UNAUTHENTICATED_ROUTES: list[str] = [
+        f'{API_V1_STR}/login',
+        f'{API_V1_STR}/docs',
+        f'{API_V1_STR}/redocs',
+        f'{API_V1_STR}/openapi'
+    ]
+
 
 settings = Settings()
 logger_namespace = os.path.basename(BasePath.parent)
-log_init = Logger('debug', logger_namespace=logger_namespace)
+log_init = Logger('debug', logger_namespace=logger_namespace, logfile=settings.LOGFILE_PATH)
 logger = log_init.get_logger()
