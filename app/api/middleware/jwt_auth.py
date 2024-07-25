@@ -1,26 +1,13 @@
-import typing
 from typing import Any
 from starlette.authentication import AuthenticationBackend
 from fastapi import Request, Response
-from app.core.config import logger
+from app.core.config import logger, settings
 from app.common.security.jwt_util import JWTUtil
 from app.common.exceptions.errors import TokenError
-from starlette.authentication import AuthenticationError, AuthCredentials
+from app.common.responses.main import StandardResponseCode
+from starlette.authentication import AuthenticationError, AuthCredentials, SimpleUser
 from starlette.requests import HTTPConnection
-from starlette.responses import JSONResponse
-import msgspec
-
-
-skip_route: list = ["/api/v1/login", "/api/v1/docs", "/api/v1/redocs", "/api/v1/openapi"]
-
-
-class MsgSpecJsonResponse(JSONResponse):
-    """
-    Json Response using high-performance msgspec library to serialize data into JSON
-    """
-
-    def render(self, content: Any) -> bytes:
-        return msgspec.json.encode(content)
+from app.common.encodes.msgspec import MsgSpecJsonResponse
 
 
 class _AuthenticateError(AuthenticationError):
@@ -38,17 +25,29 @@ class JWTAuthMiddleware(AuthenticationBackend):
 
     async def authenticate(self, request: Request):
         auth = request.headers.get("Authorization")
-        if request.url.path in skip_route:
+        if request.url.path in settings.UNAUTHENTICATED_ROUTES:
             return
 
         if not auth:
             logger.error(f"Token Header is missing from the request")
-            return
+            if settings.ENV == 'dev':
+                return
+            raise _AuthenticateError(
+                code=StandardResponseCode.HTTP_401,
+                msg="Authentication header require",
+                headers={"WWW-Authenticated": "Bearer"}
+            )
 
         scheme, token = auth.split()
         if scheme.lower() != 'bearer':
             logger.error(f"Token type not matched")
-            return
+            if settings.ENV == 'dev':
+                return
+            raise _AuthenticateError(
+                code=StandardResponseCode.HTTP_400,
+                msg="Authentication token is not matched",
+                headers={"WWW-Authenticated": "Bearer"}
+            )
         try:
             email = JWTUtil.decode_token(token=token)
             user = JWTUtil.get_user_by_email(email)
@@ -61,4 +60,4 @@ class JWTAuthMiddleware(AuthenticationBackend):
             raise _AuthenticateError(code=getattr(e, 'code', 500), msg=getattr(e, 'msg', 'Internal Server Error'))
 
         # more https://www.starlette.io/authentication
-        return AuthCredentials(['authenticated']), user
+        return AuthCredentials(['authenticated']), SimpleUser(user)
