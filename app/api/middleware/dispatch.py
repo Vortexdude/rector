@@ -10,6 +10,8 @@ class DispatchMiddleware(BaseHTTPMiddleware):
         start_time = timezone.now()
         response = await call_next(request)
         end_time = timezone.now()
-        logger.info(f"{request.client.host: <15} | {request.method: <8} | {response.status_code: <6} ")
-        logger.info(f"{request.url.path: <15} | {(end_time - start_time).total_seconds() * 1000.0}ms")
+        logger.info(
+            f"{request.client.host: <15} | {request.method: <8} | {response.status_code: <6} | " +
+            f"{request.url.path: <15} | {(end_time - start_time).total_seconds() * 1000.0:.5f}ms"
+        )
         return response
