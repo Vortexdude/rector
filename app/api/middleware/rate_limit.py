@@ -25,7 +25,6 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
         # Get the client's IP address
         _client_ip = request.client.host
-
         # Check if IP is already present in request_counts
         request_count, last_request = self.request_count.get(_client_ip, (0, timezone.min))
 
