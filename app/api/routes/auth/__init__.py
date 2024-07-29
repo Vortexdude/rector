@@ -14,8 +14,8 @@ def read_own_items(db: db_dependency, request: Request):
 
 
 @router.post("/signup")
-def user_register(db: db_dependency, data: UserCreateSchema = Body()):
-    return UserService(db).register_user(data)
+async def user_register(db: db_dependency, data: UserCreateSchema = Body()):
+    return await UserService(db).register_user(data)
 
 
 @router.post("/login")

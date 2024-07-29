@@ -26,28 +26,32 @@ class JWTAuthMiddleware(AuthenticationBackend):
     async def authenticate(self, request: Request):
         auth = request.headers.get("Authorization")
         if request.url.path in settings.UNAUTHENTICATED_ROUTES:
+            logger.warning(f"Skipping Route {request.url.path}")
             return
 
         if not auth:
-            logger.error(f"Token Header is missing from the request")
+            logger.warning(f"Token Header is missing from the request")
             if settings.ENV == 'dev':
                 return
-            raise _AuthenticateError(
-                code=StandardResponseCode.HTTP_401,
-                msg="Authentication header require",
-                headers={"WWW-Authenticated": "Bearer"}
-            )
+            else:
+                logger.error(f"Register router needs the auth header")
+                raise _AuthenticateError(
+                    code=StandardResponseCode.HTTP_401,
+                    msg="Authentication header require",
+                    headers={"WWW-Authenticated": "Bearer"}
+                )
 
         scheme, token = auth.split()
         if scheme.lower() != 'bearer':
             logger.error(f"Token type not matched")
             if settings.ENV == 'dev':
                 return
-            raise _AuthenticateError(
-                code=StandardResponseCode.HTTP_400,
-                msg="Authentication token is not matched",
-                headers={"WWW-Authenticated": "Bearer"}
-            )
+            else:
+                raise _AuthenticateError(
+                    code=StandardResponseCode.HTTP_400,
+                    msg="Authentication token is not matched",
+                    headers={"WWW-Authenticated": "Bearer"}
+                )
         try:
             email = JWTUtil.decode_token(token=token)
             user = JWTUtil.get_user_by_email(email)

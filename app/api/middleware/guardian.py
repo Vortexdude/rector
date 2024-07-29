@@ -19,28 +19,24 @@ class LoggingMiddleware(Middleware):
         logger.info(
             f"logger=rector,{request.client.host=},{request.method=},{response.status_code=},{total_time:.5f}ms"
         )
-        if 'curl' in request.headers.get('user-agent'):
-            os, device, browser = 'curl', 'curl', 'curl'
-        else:
+        try:
             os, device, browser = extract_user_info(request)
+        except KeyError:
+            os, device, browser = "null", "null", "null"
 
         host = request.client.host
         try:
             username = request.user.name
         except AttributeError:
             username = None
-        print(f"{request.user.name}")
         method = request.method
-        port = request.url.port
+        port = request.url.port or 8000
         url = request.url.path
-        router = request.scope.get('route')
-        summary = getattr(router, 'summary', None) or ''
         latency = f"{total_time:.5f}ms"
-        print(f"{os=}, {device=}, {browser=}, {host=}, {username=}, {method=}, {summary=}")
         _record = {
             'os': os, 'device': device, 'browser': browser, 'host': host, 'username': username, 'url': url,
             'method': method, 'port': port, 'time': latency
         }
-        UserActivity().set_info(**_record)
+        await UserActivity().set_info(**_record)
 
         return response

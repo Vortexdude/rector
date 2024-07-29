@@ -33,6 +33,7 @@ def register_logger() -> None:
     # adding the passlib logger to get rid of the warning about the version of bcrypt
     # https://github.com/pyca/bcrypt/issues/684#issuecomment-1858400267
     logging.getLogger('passlib').setLevel(logging.ERROR)
+    logger.info(f"Application running in the {settings.ENV} env.")
 
 
 def register_middleware(app: FastAPI) -> None:
