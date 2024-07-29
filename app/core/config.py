@@ -1,9 +1,11 @@
 from __future__ import annotations
 import os
+from dotenv import load_dotenv
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from .pathconf import BasePath, SQLITE_DATABASE_FILE
 from app.common.utils.log import Logger
 
+load_dotenv()
 __all__ = ["settings", "logger"]
 
 
@@ -13,10 +15,11 @@ class PSQL:
         POSTGRES = {
             'user': os.getenv('POSTGRES_USER', 'rector'),
             'pw': os.getenv('POSTGRES_PASSWORD', 'rector'),
-            'host': os.getenv('POSTGRES_HOST', '127.0.0.1'),
+            'host': os.getenv('POSTGRES_HOST'),
             'db': os.getenv('POSTGRES_DB', 'rector'),
         }
-        if not os.getenv('POSTGRES_USER'):
+        if not POSTGRES['host']:
+            logger.debug("info")
             return SQLITE_DATABASE_FILE
 
         return "postgresql+psycopg2://%(user)s:%(pw)s@%(host)s:5432/%(db)s" % POSTGRES
@@ -57,7 +60,7 @@ class Settings(BaseSettings):
     TOKEN_EXPIRE_SECONDS: int = 900  # 15 minutes
 
     # middleware
-    API_REQUEST_PER_MINUTE: int = 5
+    API_REQUEST_PER_MINUTE: int = 10
 
     # routes
     UNAUTHENTICATED_ROUTES: list[str] = [
@@ -65,7 +68,9 @@ class Settings(BaseSettings):
         f'{API_V1_STR}/docs',
         f'{API_V1_STR}/redocs',
         f'{API_V1_STR}/openapi'
-        f'{API_V1_STR}/signup'
+        f'{API_V1_STR}/signup',
+        f'/api/v1/openapi',
+        f"/api/v1/signup"
     ]
 
 
