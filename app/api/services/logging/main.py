@@ -1,16 +1,17 @@
 from sqlalchemy.orm import Session
-from app.api.models import ActivityLog
+from app.api.models import Guardian
+from app.core.db import get_db
+
+__all__ = ["UserActivity"]
 
 
 class UserActivity:
-    def __init__(self, db):
-        self.db: Session = db
+    def __init__(self, db: Session = next(get_db())):
+        self.db = db
 
-    def set_info(self, user_id: str, activity: str):
-        log = ActivityLog(
-            user_id=user_id,
-            activity=activity,
-        )
-        self.db.add(log)
+    async def set_info(self, *args, **kwargs):
+
+        record = Guardian(*args, **kwargs)
+        self.db.add(record)
         self.db.commit()
-        self.db.flush(log)
+        self.db.flush(record)
