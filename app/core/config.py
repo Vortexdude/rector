@@ -49,7 +49,7 @@ class Settings(BaseSettings):
     # JWT Config
     JWT_SECRET_KEY: str = os.getenv('JWT_SECRET_KEY', '12jh5439ck3s04jt94dsfsdpdfprad344784')
     TOKEN_ALGORITHM: str = 'HS256'
-    ACTIVE_ROUTES: list = ['auth', 'transform_image', 'ssl_cert_util', 'video_transcoding']
+    ACTIVE_ROUTES: list = ['auth', 'transform_image', 'ssl_cert_util', 'video_transcoding', 'cloud']
 
     # logging
     LOGFILE_PATH: str = os.path.join(BasePath, "log")
@@ -69,6 +69,8 @@ class Settings(BaseSettings):
         f'{API_V1_STR}/redocs',
         f'{API_V1_STR}/openapi'
         f'{API_V1_STR}/signup',
+        f'{API_V1_STR}/ec2/',
+        f'{API_V1_STR}/s3/',
         f'/api/v1/openapi',
         f"/api/v1/signup"
     ]
