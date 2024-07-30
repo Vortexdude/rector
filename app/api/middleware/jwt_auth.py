@@ -26,7 +26,7 @@ class JWTAuthMiddleware(AuthenticationBackend):
     async def authenticate(self, request: Request):
         auth = request.headers.get("Authorization")
         if request.url.path in settings.UNAUTHENTICATED_ROUTES:
-            logger.warning(f"Skipping Route {request.url.path}")
+            logger.warning(f"Skipping Route for authentication {request.url.path}")
             return
 
         if not auth:
