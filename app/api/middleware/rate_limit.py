@@ -4,7 +4,7 @@ from starlette.requests import Request
 from starlette.responses import Response
 from .common import Middleware
 from app.common.utils.timezone import timezone
-from app.core.config import settings, logger
+from app.core.config import settings
 
 __all__ = ["RateLimitMiddleware"]
 

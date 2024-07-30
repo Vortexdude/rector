@@ -2,6 +2,8 @@ import boto3
 from app.common.exceptions.errors import AwsConnectionError
 REGION = 'ap-south-1'
 
+__all__ = ["ec2"]
+
 
 class BaseServiceArgs:
 
