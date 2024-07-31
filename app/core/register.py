@@ -26,7 +26,7 @@ def register_app():
 
     app.logger = logger
     register_logger()
-    # register_middleware(app)
+    register_middleware(app)
     register_routes(app)
     register_exceptions()
 
@@ -49,14 +49,14 @@ def register_middleware(app: FastAPI) -> None:
         allow_methods=["*"],
         allow_headers=["*"],
     )
-    app.add_middleware(RateLimitMiddleware)
-    app.add_middleware(LoggingMiddleware)
-    app.add_middleware(DispatchMiddleware)
-    app.add_middleware(
-        AuthenticationMiddleware,
-        backend=JWTAuthMiddleware(),
-        on_error=JWTAuthMiddleware.auth_exception_handler
-    )
+    # app.add_middleware(RateLimitMiddleware)
+    # app.add_middleware(LoggingMiddleware)
+    # app.add_middleware(DispatchMiddleware)
+    # app.add_middleware(
+    #     AuthenticationMiddleware,
+    #     backend=JWTAuthMiddleware(),
+    #     on_error=JWTAuthMiddleware.auth_exception_handler
+    # )
 
 
 def register_routes(app) -> None:

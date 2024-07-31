@@ -35,12 +35,6 @@ async def get_playlist(video_name: str):
 
 @router.get("/video/{video_name}/{segment_number}.ts", response_class=FileResponse)
 async def get_segment(video_name: str, segment_number: int):
-    # if len(str(segment_number)) == 2:
-    #     segment_number = "00{}".format(segment_number)
-    # elif len(str(segment_number)) == 3:
-    #     segment_number = "0{}".format(segment_number)
-    # else:
-    #     segment_number = "000{}".format(segment_number)
 
     segment = os.path.join(settings.BASE_PATH.parent, 'data', 'video', video_name, f"{segment_number}.ts")
     if not segment:

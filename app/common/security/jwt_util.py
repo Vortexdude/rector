@@ -50,13 +50,13 @@ class JWTUtil:
             expire_seconds = settings.TOKEN_EXPIRE_SECONDS
 
         to_encode.update({'exp': expire, **kwargs})
-        token = jwt.encode(to_encode, settings.JWT_SECRET_KEY, settings.TOKEN_ALGORITHM)
+        token = jwt.encode(to_encode, settings.JWT_SECRET_KEY, settings.JWT_ALGORITHM)
         return token
 
     @staticmethod
     def decode_token(token: str) -> str:
         try:
-            payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=[settings.TOKEN_ALGORITHM])
+            payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
             user_email = payload.get('sub')
             if not user_email:
                 raise TokenError(msg="Invalid Token")
@@ -76,7 +76,7 @@ class JWTUtil:
 
 def get_current_user(token) -> User:
     try:
-        payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=[settings.TOKEN_ALGORITHM])
+        payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
         email: str = payload.get('sub')
 
         if email is None:
