@@ -1,5 +1,6 @@
 from __future__ import annotations
 import os
+from pathlib import Path
 from dotenv import load_dotenv
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from .pathconf import BasePath, SQLITE_DATABASE_FILE
@@ -29,7 +30,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=f"{BasePath}/.env", env_ignore_empty=True, extra="ignore"
     )
-    SERVER_HOST: str = os.getenv('SERVER_HOST', "0.0.0.0")
+    SERVER_HOST: str = os.getenv('SERVER_HOST', "127.0.0.1")
     SERVER_PORT: int = os.getenv('SERVER_PORT', 8000)
     DOMAIN: str = os.getenv('DOMAIN', "localhost")
     ENV: str = os.getenv("ENV", "dev")
@@ -64,6 +65,7 @@ class Settings(BaseSettings):
 
     # routes
     UNAUTHENTICATED_ROUTES: list[str] = [
+        "/favicon.ico",
         f'{API_V1_STR}/login',
         f'{API_V1_STR}/docs',
         f'{API_V1_STR}/redocs',
@@ -74,6 +76,10 @@ class Settings(BaseSettings):
         f'/api/v1/openapi',
         f"/api/v1/signup"
     ]
+
+    UNAUTHENTICATED_FILTER: list[str] = [".html", ".m3u8"]
+    BASE_PATH: Path = BasePath
+    BASE_URL: str = f"http://192.168.1.76:{SERVER_PORT}{API_V1_STR}"
 
 
 settings = Settings()

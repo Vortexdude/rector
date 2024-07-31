@@ -51,7 +51,7 @@ class BaseServiceArgs:
 
 
 class EC2(BaseServiceArgs):
-    def __init__(self, region=None):
+    def __init__(self, region='ap-south-1'):
         self.client = boto3.client('ec2')
 
     def fetch_all(self, *args, **kwargs) -> list[dict[str, str | None]] | None:

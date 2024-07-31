@@ -4,6 +4,9 @@ from app.core.config import settings, logger
 from app.core.db import Base, engine
 from app.api.middleware import RateLimitMiddleware, LoggingMiddleware, DispatchMiddleware, JWTAuthMiddleware
 from starlette.middleware.authentication import AuthenticationMiddleware
+from starlette.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+
 
 __all__ = ["register_app"]
 
@@ -19,9 +22,11 @@ def register_app():
         docs_url=settings.DOCS_URL,
         redoc_url=settings.REDOCS_URL,
     )
+    app.mount("/static", StaticFiles(directory="static"), name="static")
+
     app.logger = logger
     register_logger()
-    register_middleware(app)
+    # register_middleware(app)
     register_routes(app)
     register_exceptions()
 
@@ -37,6 +42,13 @@ def register_logger() -> None:
 
 
 def register_middleware(app: FastAPI) -> None:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
     app.add_middleware(RateLimitMiddleware)
     app.add_middleware(LoggingMiddleware)
     app.add_middleware(DispatchMiddleware)
