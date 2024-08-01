@@ -1,13 +1,13 @@
 from typing import Any
 from fastapi import Request, Response
-from starlette.authentication import AuthenticationBackend
 from app.core.config import logger, settings
+from starlette.requests import HTTPConnection
 from app.common.security.jwt_util import JWTUtil
 from app.common.exceptions.errors import TokenError
 from app.common.responses.main import StandardResponseCode
-from starlette.authentication import AuthenticationError, AuthCredentials, SimpleUser
+from starlette.authentication import AuthenticationBackend
 from app.common.encodes.msgspec import MsgSpecJsonResponse
-from starlette.requests import HTTPConnection
+from starlette.authentication import AuthenticationError, AuthCredentials
 
 
 class _AuthenticateError(AuthenticationError):

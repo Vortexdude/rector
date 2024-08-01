@@ -1,10 +1,10 @@
 from fastapi import FastAPI
-from fastapi.responses import JSONResponse
+from .common import Middleware
+from app.core.config import settings
 from starlette.requests import Request
 from starlette.responses import Response
-from .common import Middleware
+from fastapi.responses import JSONResponse
 from app.common.utils.timezone import timezone
-from app.core.config import settings
 
 __all__ = ["RateLimitMiddleware"]
 
@@ -21,6 +21,12 @@ class RateLimitMiddleware(Middleware):
         self.request_count = {}
 
     async def dispatch(self, request: Request, call_next) -> Response:
+
+        # skip the route for video stream paths
+        for un_auth_filter in settings.UNAUTHENTICATED_FILTER:
+            if un_auth_filter in request.url.path:
+                return await call_next(request)
+
         # Get the client's IP address
         _client_ip = request.client.host
         # Check if IP is already present in request_counts

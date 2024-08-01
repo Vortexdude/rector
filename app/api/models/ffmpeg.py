@@ -1,6 +1,6 @@
+from enum import Enum
 from typing import List
 from fastapi import Query
-from enum import Enum
 from pydantic.dataclasses import dataclass
 
 

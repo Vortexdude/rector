@@ -1,7 +1,7 @@
 import os
+from .processing import create_image
 from app.core.config import settings
 from app.common.utils.files import upload_file
-from .processing import create_image
 
 
 class RectorImageService:

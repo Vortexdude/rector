@@ -1,8 +1,8 @@
-from sqlalchemy import String, DATETIME, TIMESTAMP
-from sqlalchemy.orm import mapped_column, Mapped
+from datetime import datetime
 from .users import SurrogatePK
 from app.common.utils.timezone import timezone
-from datetime import datetime
+from sqlalchemy.orm import mapped_column, Mapped
+from sqlalchemy import String, DATETIME, TIMESTAMP
 
 
 class ActivityLog(SurrogatePK):
@@ -22,7 +22,7 @@ class Guardian(SurrogatePK):
     browser: Mapped[str] = mapped_column(String(30), nullable=True)
     username: Mapped[str] = mapped_column(String(50), nullable=True)
     method: Mapped[str] = mapped_column(String(10))
-    host: Mapped[str] = mapped_column(String(50))
-    url: Mapped[int] = mapped_column(String(20))
+    host: Mapped[str] = mapped_column(String(256))
+    url: Mapped[int] = mapped_column(String(256))
     port: Mapped[int] = mapped_column(String(20))
     time: Mapped[str] = mapped_column(String(30))

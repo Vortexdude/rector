@@ -1,9 +1,9 @@
 from typing import Literal
-from fastapi import APIRouter, UploadFile, File
-from fastapi.responses import FileResponse
 from app.core.config import logger
-from app.common.utils.files import model_list
 from app.core.pathconf import BasePath
+from fastapi.responses import FileResponse
+from app.common.utils.files import model_list
+from fastapi import APIRouter, UploadFile, File
 
 from .main import RectorImageService
 

@@ -1,7 +1,7 @@
-from os import path, remove
 import subprocess
-from concurrent.futures import ProcessPoolExecutor
+from os import path, remove
 from app.api.services.ffmpeg import resolutions
+from concurrent.futures import ProcessPoolExecutor
 from app.api.services.ffmpeg.ffmpeg import BaseFFMpeg
 from app.api.services.ffmpeg.models import RESOLUTION_MAPPING
 

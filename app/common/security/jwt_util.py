@@ -1,16 +1,16 @@
 import jwt
-from jwt.exceptions import InvalidTokenError, ExpiredSignatureError
-from passlib.context import CryptContext
 from fastapi import Request
 from datetime import timedelta
-from .exceptions import credentials_exception
-from app.common.utils.timezone import timezone
-from app.core.config import settings, logger
-from app.api.models.jwt import TokenData
 from app.core.db import get_db
 from app.api.models.users import User
+from app.api.models.jwt import TokenData
+from passlib.context import CryptContext
+from app.core.config import settings, logger
+from .exceptions import credentials_exception
+from app.common.utils.timezone import timezone
 from app.common.exceptions.errors import TokenError
-from sqlalchemy.orm import Session
+from jwt.exceptions import InvalidTokenError, ExpiredSignatureError
+
 
 __all__ = ["JWTUtil", "get_current_user", "login_required"]
 
