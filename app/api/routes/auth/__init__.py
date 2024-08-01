@@ -1,9 +1,9 @@
+from app.api.models import Token
 from fastapi import APIRouter, Body
 from app.core.db import db_dependency
-from app.api.schema import UserCreateSchema, UserLoginSchema
-from app.api.services import UserService
-from app.api.models import Token
 from starlette.requests import Request
+from app.api.services import UserService
+from app.api.schema import UserCreateSchema, UserLoginSchema
 
 router = APIRouter()
 

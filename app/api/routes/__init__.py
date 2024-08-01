@@ -1,5 +1,5 @@
-from app.core.config import logger
 from fastapi import APIRouter
+from app.core.config import logger
 from importlib import import_module
 from app.core.config import settings
 

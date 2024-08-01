@@ -1,5 +1,5 @@
-import glob
 import os
+import glob
 
 __all__ = ["upload_file", "model_list"]
 

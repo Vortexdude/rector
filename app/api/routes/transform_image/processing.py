@@ -1,5 +1,5 @@
-import imutils
 import cv2
+import imutils
 
 __all__ = ["create_image"]
 

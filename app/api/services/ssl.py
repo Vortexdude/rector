@@ -1,9 +1,9 @@
-import socket
 import ssl
+import socket
 import requests
+from app.core.config import logger
 from datetime import datetime as dt
 from app.common.utils.validator import URLUtil
-from app.core.config import logger
 
 
 class SSLExtractor:

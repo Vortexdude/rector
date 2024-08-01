@@ -1,10 +1,10 @@
-from sqlalchemy.orm import Mapped, mapped_column, MappedAsDataclass
-from sqlalchemy import String
-from sqlalchemy.orm import DeclarativeBase, declared_attr
 from uuid import uuid4
-from datetime import datetime
 from typing import Annotated
+from sqlalchemy import String
+from datetime import datetime
 from app.common.utils.timezone import timezone
+from sqlalchemy.orm import DeclarativeBase, declared_attr
+from sqlalchemy.orm import Mapped, mapped_column, MappedAsDataclass
 
 id_key = Annotated[str, mapped_column(String, default=lambda: str(uuid4()), unique=True, primary_key=True)]
 

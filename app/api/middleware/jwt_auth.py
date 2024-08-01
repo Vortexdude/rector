@@ -1,13 +1,13 @@
 from typing import Any
 from fastapi import Request, Response
-from starlette.authentication import AuthenticationBackend
 from app.core.config import logger, settings
+from starlette.requests import HTTPConnection
 from app.common.security.jwt_util import JWTUtil
 from app.common.exceptions.errors import TokenError
 from app.common.responses.main import StandardResponseCode
-from starlette.authentication import AuthenticationError, AuthCredentials, SimpleUser
+from starlette.authentication import AuthenticationBackend
 from app.common.encodes.msgspec import MsgSpecJsonResponse
-from starlette.requests import HTTPConnection
+from starlette.authentication import AuthenticationError, AuthCredentials
 
 
 class _AuthenticateError(AuthenticationError):
@@ -25,6 +25,10 @@ class JWTAuthMiddleware(AuthenticationBackend):
 
     async def authenticate(self, request: Request):
         auth = request.headers.get("Authorization")
+        for _route_filter in settings.UNAUTHENTICATED_FILTER:
+            if _route_filter in request.url.path:
+                return
+
         if request.url.path in settings.UNAUTHENTICATED_ROUTES:
             logger.warning(f"Skipping Route for authentication {request.url.path}")
             return

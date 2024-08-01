@@ -1,8 +1,8 @@
+from .common import Middleware
+from app.core.config import logger
 from starlette.requests import Request
 from starlette.responses import Response
-from .common import Middleware
 from app.common.utils.timezone import timezone
-from app.core.config import logger
 
 
 class DispatchMiddleware(Middleware):

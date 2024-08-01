@@ -1,6 +1,8 @@
 import boto3
 from app.common.exceptions.errors import AwsConnectionError
 
+__all__ = ["s3"]
+
 
 class S3:
     def __init__(self, region=None):

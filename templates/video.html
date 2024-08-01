@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <link href="https://vjs.zencdn.net/7.17.0/video-js.css" rel="stylesheet"/>
+        <title>Streamer</title>
+    </head>
+    <body>
+        <h2>{{ video_name }}</h2>
+<!--        <video id=vid1 class="video-js vjs-default-skin vjs-16-9" controls>-->
+        <video id=vid1 class="video-js vjs-default-skin" data-setup='{"fluid": true}' controls>
+            <source src="{{ api_version }}/playlists/{{ video_name }}.m3u8" type="application/x-mpegURL">
+        </video>
+        <script src="https://vjs.zencdn.net/7.17.0/video.js" crossorigin="anonymous"></script>
+        <script>
+            window.onload = function () {
+                videojs('vid1');
+            }
+        </script>
+    </body>
+</html>
