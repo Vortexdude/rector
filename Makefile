@@ -5,7 +5,7 @@ LOCAL_EXEC := /bin/bash -c
 $(info PROJECT_NAME: ${PROJECT_NAME})
 $(info PROJECT_HOME_DIR: ${PROJECT_HOME_DIR})
 
-apply:
+start:
 	@$(LOCAL_EXEC) "./bin/docker $@"
 
 stop:

@@ -13,6 +13,8 @@ services:
       POSTGRES_HOST: db
     networks:
       database: {}
+    volumes:
+      - ${HOME}/.aws/credentials:/home/app/.aws/credentials
   db:
     container_name: ${PROJECT_NAME}-DB
     image: postgres:12-bullseye

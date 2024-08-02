@@ -2,10 +2,11 @@ import os
 import jinja2
 from io import BytesIO
 from typing import List
+from app.api.services.aws import s3
 from app.core.config import settings
-from app.common.utils.files import upload_file
 from starlette.templating import Jinja2Templates
 from app.api.models.ffmpeg import ExportQualities
+from app.common.utils.files import upload_file, cleanup
 from app.api.services.ffmpeg.multimedia import Multiplexer
 from fastapi import APIRouter, File, UploadFile, Query, Request
 from fastapi.responses import HTMLResponse, StreamingResponse, FileResponse
@@ -21,6 +22,11 @@ def server_bytes_as_file(contents: bytes) -> StreamingResponse:
     response.write(contents)
     response.seek(0)
     return StreamingResponse(response)
+
+
+@router.get("/videos", response_class=HTMLResponse)
+def get_item(request: Request):
+    return templates.TemplateResponse(request=request, name='videos.html')
 
 
 @router.get("/playlists/{video_name}.m3u8")
@@ -65,3 +71,12 @@ def convert_to_all_formats(quality: List[ExportQualities] = Query(), file: Uploa
     mm.output_file_name = os.path.join(settings.OUTPUT_DIR, file.filename)
     mm.transcode(_qualities)
     return {"status": "file uploaded successfully"}
+
+
+@router.post("/upload_to_s3")
+def upload_file_to_s3(file: UploadFile = File(...)):
+    full_path = os.path.join(settings.UPLOAD_DIR, file.filename)
+    upload_file(file, settings.UPLOAD_DIR)
+    s3.upload_file(file_name=full_path, bucket="butena-public", key=f"media/videos/original/{file.filename}")
+    cleanup(files=[full_path])
+    return {"status": "successfully uploaded file"}

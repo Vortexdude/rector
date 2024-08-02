@@ -9,7 +9,7 @@ DOCKER_COMPOSE_OVERWRITE="${PROJECT_HOME}/docker/docker-compose-overwrite.yml"
 
 
 case $ACTION in
-    "apply")
+    "start")
         echo "Starting continuous integration . . . "
         docker compose -f $DOCKER_COMPOSE_FILE -f $DOCKER_COMPOSE_OVERWRITE\
         up --remove-orphans --build -d

@@ -19,13 +19,16 @@ class PostgresSecret(BaseSettings):
     host: str
     port: int
 
-    model_config = SettingsConfigDict(env_prefix="POSTGRES_")
+    model_config = SettingsConfigDict(env_prefix="POSTGRES_", )
 
 
 class DATABASE:
     @property
     def uri(self) -> str:
         _pg: PostgresSecret = PostgresSecret()
+        if not _pg.host:
+            _pg.host = '127.0.0.1'
+
         POSTGRES = {
             'user': _pg.user,
             'pw': _pg.password,
@@ -40,6 +43,7 @@ class BaseConfig(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=f"{BasePath}/.env", env_ignore_empty=True, extra="ignore"
     )
+    SSL: bool = False
     # filepaths
     NURAL_NETWORK_STYLE_PATH: str = os.path.join(BasePath, "models")
     UPLOAD_DIR: str = os.path.join(BasePath, "uploads")
@@ -66,12 +70,15 @@ class BaseConfig(BaseSettings):
     ENV: str = 'dev'
     PROJECT_NAME: str = 'rector'
     API_V1_STR: str = os.getenv('API_V1_STR', "/api/v1")
-    BASE_URL: str = f"http://192.168.1.76:{SERVER_PORT}{API_V1_STR}"
+    if SSL:
+        BASE_URL: str = f"https://192.168.1.76:{SERVER_PORT}{API_V1_STR}"
+    else:
+        BASE_URL: str = f"http://192.168.1.76:{SERVER_PORT}{API_V1_STR}"
     DOCS_URL: str = os.getenv('DOCS_URL', f'{API_V1_STR}/docs')
     REDOCS_URL: str = os.getenv('REDOCS_URL', f'{API_V1_STR}/redocs')
     OPENAPI_URL: str = os.getenv('OPENAPI_URL', f'{API_V1_STR}/openapi')
     DESCRIPTION: str = os.getenv('DESCRIPTION', 'FastAPI Best Architecture')
-    SQLALCHEMY_DATABASE_URL: str = DATABASE().uri
+    SQLALCHEMY_DATABASE_URL: str
 
     # routes
     UNAUTHENTICATED_ROUTES: list[str] = [
@@ -92,6 +99,7 @@ class BaseConfig(BaseSettings):
 
 
 class DevelopmentConfig(BaseConfig):
+    ENV: str = 'development'
     API_REQUEST_PER_MINUTE: int = 50
     JWT_SECRET_KEY: str = '12jh5439ck3s04jt94dsfsdpdfprad344784'
     SERVER_HOST: str = '127.0.0.1'
@@ -99,6 +107,7 @@ class DevelopmentConfig(BaseConfig):
 
 
 class ProductionConfig(BaseConfig):
+    ENV: str = 'production'
     API_REQUEST_PER_MINUTE: int = 20
     JWT_SECRET_KEY: str = '12jh5439ck3s04jt94ad344784t0u7'
     SERVER_HOST: str = '0.0.0.0'
@@ -106,7 +115,7 @@ class ProductionConfig(BaseConfig):
 
 
 @lru_cache()
-def get_settings():
+def get_settings() -> BaseSettings:
     config_cls_dict = {
         'development': DevelopmentConfig,
         'production': ProductionConfig
