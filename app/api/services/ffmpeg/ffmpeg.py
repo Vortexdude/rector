@@ -94,6 +94,7 @@ class BaseFFMpeg:
     @staticmethod
     def _validator(file: Path, exists: bool = True):
         """
+        check for input should be existed and output file should not.
         Validates the existence or non-existence of a file.
 
         Args:
