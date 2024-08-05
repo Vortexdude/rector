@@ -1,4 +1,5 @@
 import subprocess
+import inspect
 from pathlib import Path
 from os import path, remove
 from app.api.services.ffmpeg import resolutions
@@ -131,21 +132,23 @@ class Multiplexer(BaseFFMpeg):
 class HLSStream(BaseFFMpeg):
     """
     Examples:
-    >>> hls = HLSStream()
-    >>> hls.input_file_name = Path(__file__).parent.resolve() / "models.py"
-    >>> hls.video_codec = 'libx264'
-    >>> hls.video_bit_rate = '3000k'
-    >>> hls.run()
+    hls = HLSStream()
+    hls.input_file_name = Path(__file__).parent.resolve() / "models.py"
+    hls.video_codec = 'libx264'
+    hls.video_bit_rate = '3000k'
+    ll.video_codec = 'libx264'
+    ll.video_bit_rate = '3000k'
+    ll.video_buffer_size = '6000k'
+    ll.max_video_bit_rate = '6000k'
+    ll.audio_codec = 'aac'
+    ll.audio_bitrate = '128k'
+    hls.run()
 
 
     """
 
     def __init__(self):
         super().__init__()
-        self._video_codec = ['-c:v']
-        self._video_bit_rate = ['-b:v']
-        self._video_buffer_size = ['-bufsize:v']
-        self._max_video_bit_rate = ['-maxrate:v']
 
     @property
     def video_codec(self):
@@ -184,8 +187,21 @@ class HLSStream(BaseFFMpeg):
         self._max_video_bit_rate.append(value)
 
     def run(self):
-        if len(self.video_codec) > 1:
-            self.cmd.extend(self.video_codec)
+        """
+        finding the methods using inspect library, and check for property ony
+        with name not ends with _name
+        every argument is a list of two argument is set is not ignore it
+        not include the argument in main cmd is its len is 1 or less
+        """
+        for name, method in inspect.getmembers(self.__class__, predicate=inspect.isdatadescriptor):
+            if name.endswith("_name") or not isinstance(method, property):
+                continue
 
-        if len(self.video_bit_rate) > 1:
-            self.cmd.extend(self.video_bit_rate)
+            property_value = getattr(self, name)
+            if not isinstance(property_value, list):
+                continue
+            if len(property_value) > 1:
+                self.cmd.extend(property_value)
+
+        if self.output_file_name not in self.cmd:
+            self.cmd.append(str(self.output_file_name))

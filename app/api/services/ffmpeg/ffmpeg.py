@@ -10,10 +10,6 @@ class BaseFFMpeg:
         VIDEO_EXTENSIONS (list): Supported video file extensions.
         force (bool): Flag to force overwriting files.
         cmd (list): List of FFMpeg command arguments.
-        _a_codec_name (str): Audio codec name.
-        _v_codec_name (str): Video codec name.
-        a_codecs (list): List of supported audio codecs.
-        v_codecs (list): List of supported video codecs.
         _input_file_name (Path): Path to the input file.
         _output_file_name (Path): Path to the output file.
     """
@@ -30,44 +26,25 @@ class BaseFFMpeg:
         """
         self.force: bool = force
         self.cmd = ['ffmpeg']
-        self._a_codec_name: str = ""
-        self._v_codec_name: str = ""
-        self.a_codecs: list = ["libshine", ]
-        self.v_codecs: list = ["libx264", ]
         self._input_file_name: Path = Path()
         self._output_file_name = Path()
+        self._video_codec = ['-c:v']
+        self._video_bit_rate = ['-b:v']
+        self._video_buffer_size = ['-bufsize:v']
+        self._max_video_bit_rate = ['-maxrate:v']
+        self._audio_codec = ['-c:a']
+        self._audio_bitrate = ['-b:a']
 
     @property
     def input_file_name(self) -> Path:
-        """
-        Gets the input file name.
-
-        Returns:
-            Path: The input file name.
-        """
         return self._input_file_name
 
     @property
     def output_file_name(self) -> Path:
-        """
-        Gets the output file name.
-
-        Returns:
-            Path: The output file name.
-        """
         return Path(self._output_file_name)
 
     @input_file_name.setter
     def input_file_name(self, value) -> None:
-        """
-        Sets the input file name and validates its existence.
-
-        Args:
-            value (str or Path): The input file name.
-
-        Raises:
-            Exception: If the file does not exist.
-        """
         if not isinstance(value, Path):
             value = Path(value)
         self._validator(value, exists=True)
@@ -76,20 +53,64 @@ class BaseFFMpeg:
 
     @output_file_name.setter
     def output_file_name(self, value) -> None:
-        """
-        Sets the output file name and validates that it does not already exist.
-
-        Args:
-            value (str or Path): The output file name.
-
-        Raises:
-            Exception: If the file already exists.
-        """
         if not isinstance(value, Path):
             value = Path(value)
 
         self._validator(value, exists=False)
         self._output_file_name = value
+
+    @property
+    def video_codec(self):
+        return self._video_codec
+
+    @video_codec.setter
+    def video_codec(self, value):
+        """please validate the value first"""
+        self._video_codec.append(value)
+
+    @property
+    def video_bit_rate(self):
+        return self._video_bit_rate
+
+    @video_bit_rate.setter
+    def video_bit_rate(self, value):
+        """please validate the value first"""
+        self._video_bit_rate.append(value)
+
+    @property
+    def video_buffer_size(self):
+        return self._video_buffer_size
+
+    @video_buffer_size.setter
+    def video_buffer_size(self, value):
+        """please validate the value first"""
+        self._video_buffer_size.append(value)
+
+    @property
+    def max_video_bit_rate(self):
+        return self._max_video_bit_rate
+
+    @max_video_bit_rate.setter
+    def max_video_bit_rate(self, value):
+        """please validate the value first"""
+        self._max_video_bit_rate.append(value)
+
+    @property
+    def audio_bitrate(self):
+        return self._audio_bitrate
+
+    @audio_bitrate.setter
+    def audio_bitrate(self, value):
+        """validate the data here"""
+        self._audio_bitrate.append(value)
+
+    @property
+    def audio_codec(self):
+        return self._audio_codec
+
+    @audio_codec.setter
+    def audio_codec(self, value):
+        self._audio_codec.append(value)
 
     @staticmethod
     def _validator(file: Path, exists: bool = True):
@@ -110,15 +131,3 @@ class BaseFFMpeg:
 
         if file.is_file() and not exists:
             raise Exception(f"output {file} already exists")
-
-    def reverse_video(self):
-        """
-        Adds a command to reverse the video stream.
-        """
-        self.cmd.extend(['-vf', 'reverse'])
-
-    def reverse_audio(self):
-        """
-        Adds a command to reverse the audio stream.
-        """
-        self.cmd.extend(['-af', 'areverse'])
