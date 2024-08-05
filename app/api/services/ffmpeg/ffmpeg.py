@@ -59,59 +59,6 @@ class BaseFFMpeg:
         self._validator(value, exists=False)
         self._output_file_name = value
 
-    @property
-    def video_codec(self):
-        return self._video_codec
-
-    @video_codec.setter
-    def video_codec(self, value):
-        """please validate the value first"""
-        self._video_codec.append(value)
-
-    @property
-    def video_bit_rate(self):
-        return self._video_bit_rate
-
-    @video_bit_rate.setter
-    def video_bit_rate(self, value):
-        """please validate the value first"""
-        self._video_bit_rate.append(value)
-
-    @property
-    def video_buffer_size(self):
-        return self._video_buffer_size
-
-    @video_buffer_size.setter
-    def video_buffer_size(self, value):
-        """please validate the value first"""
-        self._video_buffer_size.append(value)
-
-    @property
-    def max_video_bit_rate(self):
-        return self._max_video_bit_rate
-
-    @max_video_bit_rate.setter
-    def max_video_bit_rate(self, value):
-        """please validate the value first"""
-        self._max_video_bit_rate.append(value)
-
-    @property
-    def audio_bitrate(self):
-        return self._audio_bitrate
-
-    @audio_bitrate.setter
-    def audio_bitrate(self, value):
-        """validate the data here"""
-        self._audio_bitrate.append(value)
-
-    @property
-    def audio_codec(self):
-        return self._audio_codec
-
-    @audio_codec.setter
-    def audio_codec(self, value):
-        self._audio_codec.append(value)
-
     @staticmethod
     def _validator(file: Path, exists: bool = True):
         """

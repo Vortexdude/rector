@@ -7,7 +7,7 @@ from app.core.config import settings
 from starlette.templating import Jinja2Templates
 from app.api.models.ffmpeg import ExportQualities
 from app.common.utils.files import upload_file, cleanup
-from app.api.services.ffmpeg.multimedia import HLSStream
+from app.api.services.multiplexer import HLSStreaming
 from app.api.services.ffmpeg.multimedia import Multiplexer
 from fastapi import APIRouter, File, UploadFile, Query, Request
 from fastapi.responses import HTMLResponse, StreamingResponse, FileResponse
@@ -27,42 +27,12 @@ def server_bytes_as_file(contents: bytes) -> StreamingResponse:
 
 @router.post("/generate_stream")
 def generate_stream(file: UploadFile = File()):
-    uploaded_file = os.path.join(settings.UPLOAD_DIR, file.filename)
-    if os.path.exists(uploaded_file):
-        print("file already exists")
-    else:
-        upload_file(file, settings.UPLOAD_DIR)
-
-    video_dir = os.path.join(settings.BASE_PATH, "../data/video", file.filename.split(".")[0])
-    if not os.path.exists(video_dir):
-        os.makedirs(video_dir)
-    else:
-        print("video stream path already exists")
-
-    video_url = "../video/{{ video_name }}/"
-    hls_video_size = 6
-    hls_segment_filename = os.path.join(
-        settings.BASE_PATH,
-        "../data/video",
-        file.filename.split(".")[0],
-        "segment_%03d.ts"
-    )
-    hls = HLSStream(hls_vide_url=video_url, hls_list_size=0, segment_size=hls_video_size, debug=False,
-                    segment_filename=hls_segment_filename)
-    hls.input_file_name = uploaded_file
-    hls.output_file_name = os.path.join(
-        settings.BASE_PATH,
-        "../data/playlist",
-        file.filename.split(".")[0] + '.m3u8'
-    )
-    hls.video_codec = 'libx264'
-    hls.video_bit_rate = '3000k'
-    hls.video_buffer_size = '6000k'
-    hls.max_video_bit_rate = '6000k'
-    hls.audio_codec = 'aac'
-    hls.audio_bitrate = '128k'
-    hls.run()
-    return {"status": "uploaded successfully"}
+    HLSStreaming(file).generate_stream()
+    return {
+        "status": {
+            "url": "127.0.0.1:8000/api/v1/" + file.filename.split(".")[0] + '.html'
+        }
+    }
 
 
 @router.get("/videos", response_class=HTMLResponse, tags=['UI'])

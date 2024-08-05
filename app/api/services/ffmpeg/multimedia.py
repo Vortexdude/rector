@@ -1,6 +1,6 @@
 import subprocess
 import inspect
-from pathlib import Path
+from .base import Audio, Video
 from os import path, remove
 from app.api.services.ffmpeg import resolutions
 from concurrent.futures import ProcessPoolExecutor
@@ -129,7 +129,7 @@ class Multiplexer(BaseFFMpeg):
             print("completed processing")
 
 
-class HLSStream(BaseFFMpeg):
+class HLSStream(BaseFFMpeg, Audio, Video):
     """
     Examples:
     hls = HLSStream()
@@ -147,52 +147,21 @@ class HLSStream(BaseFFMpeg):
 
     """
 
-    def __init__(self):
+    def __init__(self, debug=False, hls_list_size=0, segment_filename=None, segment_size=5, hls_vide_url=None):
         super().__init__()
+        if not debug:
+            self.cmd.extend(["-loglevel", "quiet"])
+        self.hls_cmd = []
+        self.hls_list_size: int = hls_list_size
+        self.segment_size: int = segment_size
+        self.hls_video_url: str = hls_vide_url
+        self.hls_cmd.extend(["-hls_list_size", str(self.hls_list_size)])
+        self.hls_cmd.extend(["-hls_time", str(self.segment_size)])
+        if segment_filename:
+            self.hls_cmd.extend(["-hls_segment_filename", segment_filename])
+        self.hls_cmd.extend(["-hls_base_url", self.hls_video_url])
 
-    @property
-    def video_codec(self):
-        return self._video_codec
-
-    @video_codec.setter
-    def video_codec(self, value):
-        """please validate the value first"""
-        self._video_codec.append(value)
-
-    @property
-    def video_bit_rate(self):
-        return self._video_bit_rate
-
-    @video_bit_rate.setter
-    def video_bit_rate(self, value):
-        """please validate the value first"""
-        self._video_bit_rate.append(value)
-
-    @property
-    def video_buffer_size(self):
-        return self._video_buffer_size
-
-    @video_buffer_size.setter
-    def video_buffer_size(self, value):
-        """please validate the value first"""
-        self._video_buffer_size.append(value)
-
-    @property
-    def max_video_bit_rate(self):
-        return self._max_video_bit_rate
-
-    @max_video_bit_rate.setter
-    def max_video_bit_rate(self, value):
-        """please validate the value first"""
-        self._max_video_bit_rate.append(value)
-
-    def run(self):
-        """
-        finding the methods using inspect library, and check for property ony
-        with name not ends with _name
-        every argument is a list of two argument is set is not ignore it
-        not include the argument in main cmd is its len is 1 or less
-        """
+    def update_codes(self):
         for name, method in inspect.getmembers(self.__class__, predicate=inspect.isdatadescriptor):
             if name.endswith("_name") or not isinstance(method, property):
                 continue
@@ -203,5 +172,18 @@ class HLSStream(BaseFFMpeg):
             if len(property_value) > 1:
                 self.cmd.extend(property_value)
 
+    def run(self):
+        """
+        finding the methods using inspect library, and check for property ony
+        with name not ends with _name
+        every argument is a list of two argument is set is not ignore it
+        not include the argument in main cmd is its len is 1 or less
+        """
+        self.update_codes()
+        self.cmd.extend(self.hls_cmd)
+
         if self.output_file_name not in self.cmd:
             self.cmd.append(str(self.output_file_name))
+        result = subprocess.run(self.cmd, capture_output=True, text=True)
+        print(result.stdout)
+        print(result.stderr)
