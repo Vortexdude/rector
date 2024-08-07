@@ -8,6 +8,9 @@ class URLUtil:
 
     @staticmethod
     def validate_url(url: str) -> str:
+        if url.endswith("/"):
+            url = url[:-1]
+
         if url.startswith("https"):
             url = url.lstrip("https://")
 

@@ -6,8 +6,9 @@ from app.api.services.aws import s3
 from app.core.config import settings
 from starlette.templating import Jinja2Templates
 from app.api.models.ffmpeg import ExportQualities
-from app.common.utils.files import upload_file, cleanup
 from app.api.services.multiplexer import HLSStreaming
+from starlette.responses import RedirectResponse
+from app.common.utils.files import upload_file, cleanup
 from app.api.services.ffmpeg.multimedia import Multiplexer
 from fastapi import APIRouter, File, UploadFile, Query, Request
 from fastapi.responses import HTMLResponse, StreamingResponse, FileResponse
@@ -25,14 +26,12 @@ def server_bytes_as_file(contents: bytes) -> StreamingResponse:
     return StreamingResponse(response)
 
 
-@router.post("/generate_stream")
+@router.post("/upload_video")
 def generate_stream(file: UploadFile = File()):
-    HLSStreaming(file).generate_stream()
-    return {
-        "status": {
-            "url": "127.0.0.1:8000/api/v1/" + file.filename.split(".")[0] + '.html'
-        }
-    }
+    filepath = os.path.join(settings.UPLOAD_DIR, file.filename)
+    if not os.path.exists(filepath):
+        upload_file(file, settings.UPLOAD_DIR)
+    return RedirectResponse("/api/v1/videos", status_code=303)
 
 
 @router.get("/videos", response_class=HTMLResponse, tags=['UI'])

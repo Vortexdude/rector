@@ -4,6 +4,7 @@ from app.core.db import Base, engine
 from fastapi.staticfiles import StaticFiles
 from app.core.config import settings, logger
 from starlette.middleware.cors import CORSMiddleware
+from app.api.services.eagle import system_heart_beat
 from starlette.middleware.authentication import AuthenticationMiddleware
 from app.api.middleware import RateLimitMiddleware, LoggingMiddleware, DispatchMiddleware, JWTAuthMiddleware
 
@@ -23,7 +24,7 @@ def register_app():
         redoc_url=settings.REDOCS_URL,
     )
     app.mount("/static", StaticFiles(directory="static"), name="static")
-
+    system_heart_beat(status=True)
     app.logger = logger
     register_middleware(app)
     register_routes(app)
