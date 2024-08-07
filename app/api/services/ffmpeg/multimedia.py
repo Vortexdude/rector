@@ -188,11 +188,8 @@ class HLSStream(BaseFFMpeg, Audio, Video):
 
     def run(self):
 
-        if not self.input_file_name:
-            raise FilenameMissingException(message="Input file is missing")
-
-        if not self.output_file_name:
-            raise FilenameMissingException(message="Output file is missing")
+        if not self.input_file_name or not self.output_file_name:
+            raise FilenameMissingException(message="Please specify the file name first.")
 
         self.update_codes()
         self.cmd.extend(self.hls_cmd)
