@@ -52,7 +52,7 @@ class BaseConfig(BaseSettings):
     OUTPUT_DIR: str = os.path.join(BasePath, "outputs")
 
     # JWT Config
-    JWT_SECRET_KEY: str
+    JWT_SECRET_KEY: str = ''
     JWT_ALGORITHM: str = 'HS256'
     ACTIVE_ROUTES: list = ['auth', 'transform_image', 'ssl_cert_util', 'video_transcoding', 'cloud']
 
@@ -104,14 +104,12 @@ class BaseConfig(BaseSettings):
 class DevelopmentConfig(BaseConfig):
     ENV: str = 'development'
     API_REQUEST_PER_MINUTE: int = 50
-    JWT_SECRET_KEY: str = '12jh5439ck3s04jt94dsfsdpdfprad344784'
     SERVER_HOST: str = '127.0.0.1'
 
 
 class ProductionConfig(BaseConfig):
     ENV: str = 'production'
     API_REQUEST_PER_MINUTE: int = 20
-    JWT_SECRET_KEY: str = '12jh5439ck3s04jt94ad344784t0u7'
     SERVER_HOST: str = '0.0.0.0'
 
 
