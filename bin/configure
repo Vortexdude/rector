@@ -9,6 +9,12 @@ else
     exit 127
 fi
 
+function insider() {
+    local name=$(docker ps -a | awk '/-DB/ {print $NF}')
+    docker exec -it $name /usr//bin/psql -U rector
+}
+
+
 
 function main() {
     docker --version 2>/dev/null

@@ -2,11 +2,14 @@ import subprocess
 import inspect
 from .base import Audio, Video
 from os import path, remove
+from .exceptions import FilenameMissingException
 from app.api.services.ffmpeg import resolutions
 from concurrent.futures import ProcessPoolExecutor
 from app.api.services.ffmpeg.ffmpeg import BaseFFMpeg
 from app.api.services.ffmpeg.models import RESOLUTION_MAPPING
 
+
+# https://stackoverflow.com/questions/192109/is-there-a-built-in-function-to-print-all-the-current-properties-and-values-of-a
 
 class Multiplexer(BaseFFMpeg):
     """
@@ -129,6 +132,10 @@ class Multiplexer(BaseFFMpeg):
             print("completed processing")
 
 
+#  https://gist.github.com/lukebussey/4d27678c72580aeb660c19a6fb73e9ee
+#  https://www.gumlet.com/glossary/ffprobe/
+
+
 class HLSStream(BaseFFMpeg, Audio, Video):
     """
     Examples:
@@ -152,16 +159,21 @@ class HLSStream(BaseFFMpeg, Audio, Video):
         if not debug:
             self.cmd.extend(["-loglevel", "quiet"])
         self.hls_cmd = []
-        self.hls_list_size: int = hls_list_size
-        self.segment_size: int = segment_size
-        self.hls_video_url: str = hls_vide_url
-        self.hls_cmd.extend(["-hls_list_size", str(self.hls_list_size)])
-        self.hls_cmd.extend(["-hls_time", str(self.segment_size)])
+        self.hls_cmd.extend(["-hls_list_size", str(hls_list_size)])
+        self.hls_cmd.extend(["-hls_time", str(segment_size)])
         if segment_filename:
             self.hls_cmd.extend(["-hls_segment_filename", segment_filename])
-        self.hls_cmd.extend(["-hls_base_url", self.hls_video_url])
+        if hls_vide_url:
+            self.hls_cmd.extend(["-hls_base_url", hls_vide_url])
 
     def update_codes(self):
+        """
+        finding the methods using inspect library, and check for property ony
+        with name not ends with _name
+        every argument is a list of two argument is set is not ignore it
+        not include the argument in main cmd is its len is 1 or less
+        """
+
         for name, method in inspect.getmembers(self.__class__, predicate=inspect.isdatadescriptor):
             if name.endswith("_name") or not isinstance(method, property):
                 continue
@@ -173,12 +185,10 @@ class HLSStream(BaseFFMpeg, Audio, Video):
                 self.cmd.extend(property_value)
 
     def run(self):
-        """
-        finding the methods using inspect library, and check for property ony
-        with name not ends with _name
-        every argument is a list of two argument is set is not ignore it
-        not include the argument in main cmd is its len is 1 or less
-        """
+
+        if not self.input_file_name or not self.output_file_name:
+            raise FilenameMissingException(message="Please specify the file name first.")
+
         self.update_codes()
         self.cmd.extend(self.hls_cmd)
 

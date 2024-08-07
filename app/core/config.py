@@ -16,7 +16,7 @@ class PostgresSecret(BaseSettings):
     user: str
     password: str
     db: str
-    host: str
+    host: str = "127.0.0.1"
     port: int
 
     model_config = SettingsConfigDict(env_prefix="POSTGRES_", )
@@ -25,9 +25,10 @@ class PostgresSecret(BaseSettings):
 class DATABASE:
     @property
     def uri(self) -> str:
+        if os.getenv("ENV") == 'development':
+            return SQLITE_DATABASE_FILE
+
         _pg: PostgresSecret = PostgresSecret()
-        if not _pg.host:
-            _pg.host = '127.0.0.1'
 
         POSTGRES = {
             'user': _pg.user,
@@ -36,6 +37,7 @@ class DATABASE:
             'db': _pg.db,
             'port': str(_pg.port),
         }
+
         return "postgresql+psycopg2://%(user)s:%(pw)s@%(host)s:%(port)s/%(db)s" % POSTGRES
 
 
@@ -50,7 +52,7 @@ class BaseConfig(BaseSettings):
     OUTPUT_DIR: str = os.path.join(BasePath, "outputs")
 
     # JWT Config
-    JWT_SECRET_KEY: str
+    JWT_SECRET_KEY: str = ''
     JWT_ALGORITHM: str = 'HS256'
     ACTIVE_ROUTES: list = ['auth', 'transform_image', 'ssl_cert_util', 'video_transcoding', 'cloud']
 
@@ -78,7 +80,7 @@ class BaseConfig(BaseSettings):
     REDOCS_URL: str = os.getenv('REDOCS_URL', f'{API_V1_STR}/redocs')
     OPENAPI_URL: str = os.getenv('OPENAPI_URL', f'{API_V1_STR}/openapi')
     DESCRIPTION: str = os.getenv('DESCRIPTION', 'FastAPI Best Architecture')
-    SQLALCHEMY_DATABASE_URL: str
+    SQLALCHEMY_DATABASE_URL: str = DATABASE().uri
 
     # routes
     UNAUTHENTICATED_ROUTES: list[str] = [
@@ -91,7 +93,8 @@ class BaseConfig(BaseSettings):
         f'{API_V1_STR}/ec2/',
         f'{API_V1_STR}/s3/',
         f'/api/v1/openapi',
-        f"/api/v1/signup"
+        f"/api/v1/signup",
+        f"/api/v1/videos"
     ]
 
     UNAUTHENTICATED_FILTER: list[str] = [".html", ".m3u8", '.ts']
@@ -101,17 +104,13 @@ class BaseConfig(BaseSettings):
 class DevelopmentConfig(BaseConfig):
     ENV: str = 'development'
     API_REQUEST_PER_MINUTE: int = 50
-    JWT_SECRET_KEY: str = '12jh5439ck3s04jt94dsfsdpdfprad344784'
     SERVER_HOST: str = '127.0.0.1'
-    SQLALCHEMY_DATABASE_URL: str = SQLITE_DATABASE_FILE
 
 
 class ProductionConfig(BaseConfig):
     ENV: str = 'production'
     API_REQUEST_PER_MINUTE: int = 20
-    JWT_SECRET_KEY: str = '12jh5439ck3s04jt94ad344784t0u7'
     SERVER_HOST: str = '0.0.0.0'
-    SQLALCHEMY_DATABASE_URL: str = DATABASE().uri
 
 
 @lru_cache()

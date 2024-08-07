@@ -4,14 +4,7 @@ from app.common.utils.timezone import timezone
 from sqlalchemy.orm import mapped_column, Mapped
 from sqlalchemy import String, TIMESTAMP, Integer
 
-
-class ActivityLog(Base):
-    __tablename__ = 'activity_logs'
-
-    id: Mapped[int] = mapped_column(Integer, autoincrement=True, primary_key=True, nullable=False)
-    user_id: Mapped[str] = mapped_column(String(50), nullable=False)
-    activity: Mapped[str] = mapped_column(String(254), nullable=True)
-    timestamps: Mapped[datetime] = mapped_column(TIMESTAMP, default=timezone.now())
+__all__ = ["Guardian", "Videos"]
 
 
 class Guardian(Base):
@@ -28,3 +21,14 @@ class Guardian(Base):
     url: Mapped[int] = mapped_column(String(256))
     port: Mapped[int] = mapped_column(String(20))
     time: Mapped[str] = mapped_column(String(30))
+
+
+class Videos(Base):
+    __tablename__ = "videos"
+
+    id: Mapped[int] = mapped_column(Integer, autoincrement=True, primary_key=True, nullable=False)
+    name: Mapped[str] = mapped_column(String, nullable=False)
+    description: Mapped[str] = mapped_column(String, nullable=True)
+    path: Mapped[str] = mapped_column(String, nullable=False)
+    uploaded_by: Mapped[str] = mapped_column(String, nullable=True)
+    uploaded_at: Mapped[datetime] = mapped_column(TIMESTAMP, default=timezone.now())
