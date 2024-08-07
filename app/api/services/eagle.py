@@ -1,8 +1,8 @@
+import threading
 from app.core.config import settings
 from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler, FileSystemEvent
-import threading
 from app.api.services.multiplexer import HLSStreaming
+from watchdog.events import FileSystemEventHandler, FileSystemEvent
 
 
 def generate_hls_stream(file):

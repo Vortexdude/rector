@@ -1,12 +1,11 @@
 import os
 import jinja2
+from glob import glob
 from io import BytesIO
 from typing import List
-from app.api.services.aws import s3
 from app.core.config import settings
 from starlette.templating import Jinja2Templates
 from app.api.models.ffmpeg import ExportQualities
-from app.api.services.multiplexer import HLSStreaming
 from starlette.responses import RedirectResponse
 from app.common.utils.files import upload_file, cleanup
 from app.api.services.ffmpeg.multimedia import Multiplexer
@@ -27,7 +26,11 @@ def server_bytes_as_file(contents: bytes) -> StreamingResponse:
 
 
 @router.post("/upload_video")
-def generate_stream(file: UploadFile = File()):
+def upload_video(file: UploadFile = File()):
+    filename, file_extension = file.filename.split(".")
+    if len(filename) >= 15:
+        file.filename = filename[:15] + '.' + file_extension
+
     filepath = os.path.join(settings.UPLOAD_DIR, file.filename)
     if not os.path.exists(filepath):
         upload_file(file, settings.UPLOAD_DIR)
@@ -36,10 +39,12 @@ def generate_stream(file: UploadFile = File()):
 
 @router.get("/videos", response_class=HTMLResponse, tags=['UI'])
 def get_item(request: Request):
-    return templates.TemplateResponse(request=request, name='videos.html')
+    video_files = str(settings.BASE_PATH.joinpath('../data/playlist/*'))
+    files = [os.path.basename(file) for file in glob(video_files, recursive=True)]
+    return templates.TemplateResponse(request=request, name='videos.html', context={'videos': files})
 
 
-@router.get("/playlists/{video_name}.m3u8")
+@router.get("/playlists/{video_name}.m3u8", tags=['playlist'])
 async def get_playlist(video_name: str):
     try:
         template = playlist_template.get_template(f"{video_name}.m3u8")
@@ -49,7 +54,7 @@ async def get_playlist(video_name: str):
     return server_bytes_as_file(formatted_template.encode("utf-8"))
 
 
-@router.get("/video/{video_name}/{segment_number}.ts", response_class=FileResponse)
+@router.get("/video/{video_name}/{segment_number}.ts", response_class=FileResponse, tags=['segments'])
 async def get_segment(video_name: str, segment_number: str):
     segment = os.path.join(settings.BASE_PATH.parent, 'data', 'video', video_name, f"{segment_number}.ts")
     if not segment:
@@ -80,12 +85,3 @@ def convert_to_all_formats(quality: List[ExportQualities] = Query(), file: Uploa
     mm.output_file_name = os.path.join(settings.OUTPUT_DIR, file.filename)
     mm.transcode(_qualities)
     return {"status": "file uploaded successfully"}
-
-
-@router.post("/upload_to_s3")
-def upload_file_to_s3(file: UploadFile = File(...)):
-    full_path = os.path.join(settings.UPLOAD_DIR, file.filename)
-    upload_file(file, settings.UPLOAD_DIR)
-    s3.upload_file(file_name=full_path, bucket="butena-public", key=f"media/videos/original/{file.filename}")
-    cleanup(files=[full_path])
-    return {"status": "successfully uploaded file"}
