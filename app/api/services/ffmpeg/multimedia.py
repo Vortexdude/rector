@@ -159,14 +159,12 @@ class HLSStream(BaseFFMpeg, Audio, Video):
         if not debug:
             self.cmd.extend(["-loglevel", "quiet"])
         self.hls_cmd = []
-        self.hls_list_size: int = hls_list_size
-        self.segment_size: int = segment_size
-        self.hls_video_url: str = hls_vide_url
-        self.hls_cmd.extend(["-hls_list_size", str(self.hls_list_size)])
-        self.hls_cmd.extend(["-hls_time", str(self.segment_size)])
+        self.hls_cmd.extend(["-hls_list_size", str(hls_list_size)])
+        self.hls_cmd.extend(["-hls_time", str(segment_size)])
         if segment_filename:
             self.hls_cmd.extend(["-hls_segment_filename", segment_filename])
-        self.hls_cmd.extend(["-hls_base_url", self.hls_video_url])
+        if hls_vide_url:
+            self.hls_cmd.extend(["-hls_base_url", hls_vide_url])
 
     def update_codes(self):
         """
