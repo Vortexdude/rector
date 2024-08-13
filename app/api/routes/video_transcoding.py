@@ -13,10 +13,9 @@ from app.api.models.ffmpeg import ExportQualities
 from app.api.services.ffmpeg.multimedia import Multiplexer
 from fastapi import APIRouter, File, UploadFile, Query, Request
 from fastapi.responses import HTMLResponse, StreamingResponse, FileResponse
-from functools import wraps
 
 templates = Jinja2Templates(directory="templates")
-playlist_template = jinja2.Environment(loader=jinja2.PackageLoader('data', 'playlist'), )
+playlist_template = Jinja2Templates(directory="data/playlist")
 
 router = APIRouter(tags=['ffmpeg'])
 
@@ -50,6 +49,7 @@ def get_item(request: Request):
     video_files = str(settings.BASE_PATH.joinpath('../data/playlist/*'))
     files = [os.path.basename(file) for file in glob(video_files, recursive=True)]
     return templates.TemplateResponse(request=request, name='videos.html', context={'videos': files})
+
 
 @router.delete("/videos")
 def delete_videos(video_name: str):

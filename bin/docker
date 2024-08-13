@@ -10,6 +10,15 @@ export PYTHONPATH="${CURDIR}/../"
 DOCKER_COMPOSE_FILE="${PROJECT_HOME}/docker/docker-compose.yml"
 DOCKER_COMPOSE_OVERWRITE="${PROJECT_HOME}/docker/docker-compose-overwrite.yml"
 
+
+[ ! -f "${PROJECT_HOME}/data" ] && mkdir -p "${PROJECT_HOME}/data/{playlist,video}"
+[ ! -f "${PROJECT_HOME}/static" ] && mkdir -p "${PROJECT_HOME}/static"
+[ ! -f "${PROJECT_HOME}/templates" ] && mkdir -p "${PROJECT_HOME}/templates"
+[ ! -f "${PROJECT_HOME}/app/log" ] && mkdir -p "${PROJECT_HOME}/app/log"
+[ ! -f "${PROJECT_HOME}/app/.env" ] && cp -r "${PROJECT_HOME}/app/.env.sample" "${PROJECT_HOME}/app/.env"
+
+docker network create database 2>/dev/null | true
+
 # get the linux version
 source /etc/os-release 2>/dev/null
 if [[ "$NAME" == "Ubuntu" ]]; then

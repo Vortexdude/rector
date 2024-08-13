@@ -1,0 +1,16 @@
+KERNEL!="sd[a-z][0-9]", GOTO="media_by_auto_mount_end"
+IMPORT{program}="/usr/sbin/blkid -o udev -p %N"
+
+# get label or create new one
+ENV{ID_FS_LABEL}!="", ENV{dir_name}="%E{ID_FS_LABEL}"
+ENV{ID_FS_LABEL}=="", ENV{dir_name}="usbhd-%k"
+
+# mounts
+ACTION=="add", ENV{mount_options}="realtime"
+ACTION=="add", ENV{ID_FS_TYPE}=="vfat|ntfs" ENV{mount_options}="$env{mont_options},utf-8,gid=100,umask=002"
+
+# mounts and start backup script
+ACTION=="add", ENV{ID_FS_UUID}="D4E2-0D47", RUN+="/usr/bin/mkdir -p /media/%E{dir_name}", RUN+="/usr/bin/mount -o $env{mount_options} /dev/%k /media/%E{dir_name}", MODE="0770", GROUP="plugdev", RUN+="echo \"%E{dir_name}\" >>/tmp/udev.log"
+
+# Exit
+LABEL="media_by_auto_mount_end"
