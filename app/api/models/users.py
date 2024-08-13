@@ -1,9 +1,9 @@
 from uuid import uuid4
+from app.core.db import Base
 from sqlalchemy import String, Boolean
 from sqlalchemy.orm import mapped_column, Mapped
-from app.core.db import Base
 
-__all__ = ["User"]
+__all__ = ["User", "SurrogatePK"]
 
 
 class SurrogatePK(Base):

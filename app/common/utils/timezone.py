@@ -1,6 +1,6 @@
 import zoneinfo
-from datetime import datetime
 from app.core.config import settings
+from datetime import datetime, timedelta
 
 
 class Timezone:
@@ -10,6 +10,19 @@ class Timezone:
 
     def now(self) -> datetime:
         return datetime.now(tz=self.tz)
+
+    @property
+    def min(self) -> datetime:
+        return datetime.min
+
+    @property
+    def now_tz(self):
+        return datetime.now().replace(tzinfo=None)
+
+    @staticmethod
+    def timedelta(*args, **kwargs) -> timedelta:
+        """Adding new functionality"""
+        return timedelta(*args, **kwargs)
 
 
 timezone = Timezone()

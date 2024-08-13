@@ -1,5 +1,5 @@
-from starlette.exceptions import HTTPException
 from starlette import status
+from starlette.exceptions import HTTPException
 
 credentials_exception = HTTPException(
     status_code=status.HTTP_401_UNAUTHORIZED,

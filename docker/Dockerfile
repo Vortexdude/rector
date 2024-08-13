@@ -16,6 +16,9 @@ COPY requirements*.txt /
 RUN pip install --no-cache-dir -r /requirements-prd.txt
 
 COPY ./app ${HOME}
+COPY ./data /home/data
+COPY ./static /home/static
+COPY ./templates /home/templates
 
 COPY ./bin/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh

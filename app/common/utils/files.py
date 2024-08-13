@@ -1,7 +1,7 @@
-import glob
 import os
+import glob
 
-__all__ = ["upload_file", "model_list"]
+__all__ = ["upload_file", "model_list", "cleanup"]
 
 
 def model_list(project_home_dir) -> list:
@@ -22,3 +22,8 @@ def upload_file(file, upload_dir):
         return {"message": "Error while uploading the file."}
     finally:
         file.file.close()
+
+
+def cleanup(files: list):
+    for file in files:
+        os.remove(file)

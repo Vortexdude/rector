@@ -1,11 +1,12 @@
 from datetime import timedelta
 from sqlalchemy.orm import Session
-from sqlalchemy.exc import SQLAlchemyError
-from app.common.security.jwt_util import JWTUtil
-from app.common.security.exceptions import credentials_exception
 from app.core.config import settings
 from app.api.models.jwt import Token
 from app.api.models.users import User
+from sqlalchemy.exc import SQLAlchemyError
+from app.common.security.jwt_util import JWTUtil
+from app.common.security.exceptions import credentials_exception
+
 
 __all__ = ["UserService"]
 
@@ -14,7 +15,7 @@ class UserService:
     def __init__(self, db: Session):
         self.db = db
 
-    def register_user(self, data):
+    async def register_user(self, data):
         user = User(
             name=data.name,
             email=data.email,

@@ -1,14 +1,16 @@
 import jwt
-from jwt.exceptions import InvalidTokenError
-from passlib.context import CryptContext
 from fastapi import Request
 from datetime import timedelta
-from .exceptions import credentials_exception
-from app.common.utils.timezone import timezone
-from app.core.config import settings, logger
-from app.api.models.jwt import TokenData
 from app.core.db import get_db
 from app.api.models.users import User
+from app.api.models.jwt import TokenData
+from passlib.context import CryptContext
+from app.core.config import settings, logger
+from .exceptions import credentials_exception
+from app.common.utils.timezone import timezone
+from app.common.exceptions.errors import TokenError
+from jwt.exceptions import InvalidTokenError, ExpiredSignatureError
+
 
 __all__ = ["JWTUtil", "get_current_user", "login_required"]
 
@@ -48,13 +50,33 @@ class JWTUtil:
             expire_seconds = settings.TOKEN_EXPIRE_SECONDS
 
         to_encode.update({'exp': expire, **kwargs})
-        token = jwt.encode(to_encode, settings.JWT_SECRET_KEY, settings.TOKEN_ALGORITHM)
+        token = jwt.encode(to_encode, settings.JWT_SECRET_KEY, settings.JWT_ALGORITHM)
         return token
+
+    @staticmethod
+    def decode_token(token: str) -> str:
+        try:
+            payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
+            user_email = payload.get('sub')
+            if not user_email:
+                raise TokenError(msg="Invalid Token")
+
+        except ExpiredSignatureError:
+            raise TokenError(msg='Token Expired')
+        except (jwt.PyJWTError, Exception):
+            raise TokenError(msg="Invalid Token")
+
+        return user_email
+
+    @staticmethod
+    def get_user_by_email(email):
+        db = next(get_db())
+        return db.query(User).filter_by(email=email).first()
 
 
 def get_current_user(token) -> User:
     try:
-        payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=[settings.TOKEN_ALGORITHM])
+        payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
         email: str = payload.get('sub')
 
         if email is None:

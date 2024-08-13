@@ -1,3 +1,6 @@
 services:
   main:
     platform: 'linux/amd64'
+    environment:
+      - ENV=production
+      - SERVER_HOST=0.0.0.0

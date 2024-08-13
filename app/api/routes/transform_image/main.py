@@ -1,29 +1,27 @@
-import imutils
-import cv2
-
-__all__ = ["create_image"]
-
-
-SCALE_FACTOR = 1.1
-MEAN = (103.939, 116.779, 123.680)
-swapRB = False
-crop = False
+import os
+from .processing import create_image
+from app.core.config import settings
+from app.common.utils.files import upload_file
 
 
-def create_image(model, _image, output_image=None):
+class RectorImageService:
+    def __init__(self, model, input_file) -> None:
+        self.model = model
+        self.input_file = input_file
+        self.model_path = None
+        self.model_base_path = None
+        self.input_image_path = None
+        self.output_image_path = None
 
-    net = cv2.dnn.readNetFromTorch(model)
-    image = cv2.imread(_image)
-    image = imutils.resize(image, width=600)
-    (h, w) = image.shape[:2]
-    blob = cv2.dnn.blobFromImage(image, SCALE_FACTOR, (w, h), MEAN, swapRB=swapRB, crop=crop)
-    net.setInput(blob)
-    output = net.forward()
-    output = output.reshape((3, output.shape[2], output.shape[3]))
-    output[0] += MEAN[0]
-    output[1] += MEAN[1]
-    output[2] += MEAN[2]
-    # output /= 255.0
-    output = output.transpose(1, 2, 0)
-    cv2.imwrite(output_image, output)
-    return output_image
+    def _join_paths(self) -> None:
+        self.model_base_path = settings.NURAL_NETWORK_STYLE_PATH
+        self.input_image_path = os.path.join(settings.UPLOAD_DIR, self.input_file.filename)
+        self.output_image_path = os.path.join(settings.OUTPUT_DIR, f"{self.model}_{self.input_file.filename}")
+
+    def process(self) -> str:
+        model_filename = f"{self.model.replace('-', '/')}.t7" if "-" in self.model else f"{self.model}.t7"
+        upload_file(self.input_file, settings.UPLOAD_DIR)
+        self._join_paths()
+        self.model_path = os.path.join(self.model_base_path, model_filename)
+        create_image(self.model_path, self.input_image_path, self.output_image_path)
+        return self.output_image_path
