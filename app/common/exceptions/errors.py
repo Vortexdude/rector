@@ -13,3 +13,10 @@ class TokenError(HTTPError):
 
     def __init__(self, *, msg: str = "Not Authenticated", headers: dict[str, Any] = None):
         super().__init__(code=self.code, msg=msg, headers=headers or {"WWW-Authenticated": "Bearer"})
+
+
+class AwsConnectionError(HTTPError):
+    code = StandardResponseCode.HTTP_502
+
+    def __init__(self, *, msg: str = "Cant able to communication with AWS servers", headers: dict[str, Any] = None):
+        super().__init__(code=self.code, msg=msg, headers=headers or {"WWW-Authentication-Bearer"})

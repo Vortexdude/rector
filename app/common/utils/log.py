@@ -1,5 +1,5 @@
-import logging
 import json
+import logging
 from typing import Dict, Any
 
 __all__ = ["Logger", "timestamp_log_config"]

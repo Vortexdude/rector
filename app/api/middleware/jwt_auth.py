@@ -1,13 +1,13 @@
 from typing import Any
 from fastapi import Request, Response
-from starlette.authentication import AuthenticationBackend
 from app.core.config import logger, settings
+from starlette.requests import HTTPConnection
 from app.common.security.jwt_util import JWTUtil
 from app.common.exceptions.errors import TokenError
 from app.common.responses.main import StandardResponseCode
-from starlette.authentication import AuthenticationError, AuthCredentials, SimpleUser
+from starlette.authentication import AuthenticationBackend
 from app.common.encodes.msgspec import MsgSpecJsonResponse
-from starlette.requests import HTTPConnection
+from starlette.authentication import AuthenticationError, AuthCredentials
 
 
 class _AuthenticateError(AuthenticationError):
@@ -24,22 +24,25 @@ class JWTAuthMiddleware(AuthenticationBackend):
         return MsgSpecJsonResponse(content={"code": exc.code, "msg": exc.msg, "data": None}, status_code=exc.code)
 
     async def authenticate(self, request: Request):
-        auth = request.headers.get("Authorization")
-        if request.url.path in settings.UNAUTHENTICATED_ROUTES:
-            logger.warning(f"Skipping Route {request.url.path}")
+        if settings.ENV == 'development':
             return
 
+        for _route_filter in settings.UNAUTHENTICATED_FILTER:
+            if _route_filter in request.url.path:
+                return
+
+        if request.url.path in settings.UNAUTHENTICATED_ROUTES:
+            logger.warning(f"Skipping Route for authentication {request.url.path}")
+            return
+
+        auth = request.headers.get("Authorization")
         if not auth:
             logger.warning(f"Token Header is missing from the request")
-            if settings.ENV == 'dev':
-                return
-            else:
-                logger.error(f"Register router needs the auth header")
-                raise _AuthenticateError(
-                    code=StandardResponseCode.HTTP_401,
-                    msg="Authentication header require",
-                    headers={"WWW-Authenticated": "Bearer"}
-                )
+            raise _AuthenticateError(
+                code=StandardResponseCode.HTTP_401,
+                msg="Authentication header require",
+                headers={"WWW-Authenticated": "Bearer"}
+            )
 
         scheme, token = auth.split()
         if scheme.lower() != 'bearer':

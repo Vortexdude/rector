@@ -1,5 +1,5 @@
-import subprocess
 import json
+import subprocess
 
 
 def ffprobe(filename: str) -> json:

@@ -1,15 +1,15 @@
 from pathlib import Path
 import uvicorn
-from app.core.register import register_app
 from app.core.config import settings
 from app.common.utils.log import timestamp_log_config
+from app.core.register import register_app
 
 app = register_app()
 
 if __name__ == "__main__":
     try:
         config = uvicorn.Config(
-            app=f"{Path(__file__).stem}:app",
+            app=app,
             host=settings.SERVER_HOST,
             port=settings.SERVER_PORT,
             reload=True,
