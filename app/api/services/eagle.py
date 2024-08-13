@@ -1,9 +1,10 @@
+import os
 import threading
 from app.core.config import settings
 from watchdog.observers import Observer
 from app.api.services.multiplexer import HLSStreaming
 from watchdog.events import FileSystemEventHandler, FileSystemEvent
-
+from app.common.utils.files import cleanup
 
 def generate_hls_stream(file):
     HLSStreaming(file).generate_stream()
@@ -19,6 +20,9 @@ class HeartBeat(FileSystemEventHandler):
             print("Generating HLS stream")
             generate_stream = threading.Thread(target=generate_hls_stream, name="Streaming", kwargs={'file': event.src_path})
             generate_stream.start()
+
+            while not generate_stream.isAlive():
+                cleanup(files=[event.src_path])
 
     # def on_deleted(self, event: FileSystemEvent) -> None:
     #     pass

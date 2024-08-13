@@ -1,13 +1,5 @@
 #!/usr/bin/env bash
 
-# get the linux version
-source /etc/os-release 2>/dev/null
-if [[ "$NAME" == "Ubuntu" ]]; then
-    echo "Configuring for ubuntu system"
-else
-    echo "system not compaitable for the system"
-    exit 127
-fi
 
 function insider() {
     local name=$(docker ps -a | awk '/-DB/ {print $NF}')
@@ -15,41 +7,6 @@ function insider() {
 }
 
 
-
-function main() {
-    docker --version 2>/dev/null
-    [ $? != 0 ] && prepare-system && install-docker
-    cat /etc/group | grep docker
-    [ $? != 0 ] && sudo groupadd docker && sudo usermod -aG docker $USER
-    sudo usermod -aG docker $USER
-
-}
-
-function install-docker() {
-    sudo apt-get install -y \
-    docker-ce \
-    docker-ce-cli \
-    containerd.io \
-    docker-buildx-plugin \
-    docker-compose-plugin
-}
-
-function prepare-system() {
-    sudo apt-get update -y
-    sudo apt-get install ca-certificates curl
-    sudo install -m 0755 -d /etc/apt/keyrings
-    sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
-    sudo chmod a+r /etc/apt/keyrings/docker.asc
-
-    # Add the repository to Apt sources:
-    echo \
-      "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
-      $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
-      sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-    sudo apt-get update -y
-}
-
-#main
 set -a
 source "${PWD}/app/.env"
 export PYTHONPATH=${PWD}

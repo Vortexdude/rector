@@ -1,6 +1,7 @@
 #!/bin/bash
 ACTION=$1
 CURDIR=$(cd $(dirname $0) && pwd)
+source "${CURDIR}/utils"
 export PROJECT_HOME=$(cd "$CURDIR/../" && pwd)
 source "${PROJECT_HOME}/dash/ascii_Art"
 project_name=$(basename $PROJECT_HOME)
@@ -8,6 +9,16 @@ export PROJECT_NAME="${project_name^}"
 export PYTHONPATH="${CURDIR}/../"
 DOCKER_COMPOSE_FILE="${PROJECT_HOME}/docker/docker-compose.yml"
 DOCKER_COMPOSE_OVERWRITE="${PROJECT_HOME}/docker/docker-compose-overwrite.yml"
+
+# get the linux version
+source /etc/os-release 2>/dev/null
+if [[ "$NAME" == "Ubuntu" ]]; then
+    echo "Configuring for ubuntu system"
+    install_docker
+else
+    echo "system not compatible for the system"
+    exit 127
+fi
 
 
 case $ACTION in

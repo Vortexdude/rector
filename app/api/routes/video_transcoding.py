@@ -51,6 +51,13 @@ def get_item(request: Request):
     files = [os.path.basename(file) for file in glob(video_files, recursive=True)]
     return templates.TemplateResponse(request=request, name='videos.html', context={'videos': files})
 
+@router.delete("/videos")
+def delete_videos(video_name: str):
+    video_files = str(settings.BASE_PATH.joinpath('../data/playlist/*'))
+    files = [os.path.basename(file) for file in glob(video_files, recursive=True)]
+    print(files)
+    return {"status": "video Deleted", "id": video_name}
+
 
 @router.get("/playlists/{video_name}.m3u8", tags=['playlist'])
 async def get_playlist(video_name: str):
