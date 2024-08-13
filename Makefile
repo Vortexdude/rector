@@ -10,3 +10,6 @@ start:
 
 stop:
 	@$(LOCAL_EXEC) "./bin/docker $@"
+
+local:
+	@$(LOCAL_EXEC) "./bin/docker $@"

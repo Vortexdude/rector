@@ -2,8 +2,10 @@
 ACTION=$1
 CURDIR=$(cd $(dirname $0) && pwd)
 export PROJECT_HOME=$(cd "$CURDIR/../" && pwd)
+source "${PROJECT_HOME}/dash/ascii_Art"
 project_name=$(basename $PROJECT_HOME)
 export PROJECT_NAME="${project_name^}"
+export PYTHONPATH="${CURDIR}/../"
 DOCKER_COMPOSE_FILE="${PROJECT_HOME}/docker/docker-compose.yml"
 DOCKER_COMPOSE_OVERWRITE="${PROJECT_HOME}/docker/docker-compose-overwrite.yml"
 
@@ -11,6 +13,7 @@ DOCKER_COMPOSE_OVERWRITE="${PROJECT_HOME}/docker/docker-compose-overwrite.yml"
 case $ACTION in
     "start")
         echo "Starting continuous integration . . . "
+        echo -e "$design \n \n"
         docker compose -f $DOCKER_COMPOSE_FILE -f $DOCKER_COMPOSE_OVERWRITE\
         up --remove-orphans --build -d
     ;;
@@ -18,6 +21,23 @@ case $ACTION in
         echo "Destroying ..."
         docker compose -f $DOCKER_COMPOSE_FILE -f $DOCKER_COMPOSE_OVERWRITE\
         down --remove-orphans
+    ;;
+    "local")
+        echo "local Development"
+        echo "$pc"
+        echo "Searching for the the old running containers . . "
+        old_con=$(docker ps | awk -v val="${PROJECT_NAME}$" '$0 ~ val {print $1}')
+        if [ ! -z $old_con ]; then
+            echo "Found running container ${old_con}"
+            echo "Stopping old container ${old_con} ..."
+            docker container stop "${old_con}"
+        else
+            echo "No running container found for the name ${PROJECT_NAME}"
+        fi
+        docker compose -f $DOCKER_COMPOSE_FILE -f $DOCKER_COMPOSE_OVERWRITE\
+        up --remove-orphans db -d
+        export ENV="development"
+        python3 ./app/main.py
     ;;
     *)
         echo "Other args"

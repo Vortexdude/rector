@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from app.api import routes
-from app.core.db import Base, engine
+from app.core.db import Base, engine, display_metadata
 from fastapi.staticfiles import StaticFiles
 from app.core.config import settings, logger
 from starlette.middleware.cors import CORSMiddleware
@@ -68,4 +68,6 @@ def register_exceptions() -> None:
 
 
 def register_db() -> None:
+    logger.info("Creating database Metadata ...")
     Base.metadata.create_all(bind=engine)
+    display_metadata()

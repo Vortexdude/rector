@@ -73,6 +73,11 @@
             <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
                 <h2 class="mt-4">Home</h2>
                 <p>Welcome to the homepage! Explore and enjoy our video content.</p>
+                <div class="list-group">
+                   {% for video in videos %}
+                  <a href="/api/v1/{{ video.split('.')[0] }}.html" class="list-group-item list-group-item-action">{{ video.split('.')[0] }}</a>
+                    {% endfor %}
+                </div>
             </div>
             <div class="tab-pane fade" id="upload" role="tabpanel" aria-labelledby="upload-tab">
                 <h2 class="mt-4">Upload Video</h2>

@@ -54,7 +54,7 @@ def display_metadata(meta_data: metadata = metadata):
 
         @property
         def footer(self) -> str:
-            return f"+{'-'*self._col[1]}+{'-'*self._type[1]}+{'-'*self._pk[1]}+{'-'*self._nul[1]}+{'-'*self._def[1]}+{'-'*self._fk[1]}+"
+            return f"+{'-' * self._col[1]}+{'-' * self._type[1]}+{'-' * self._pk[1]}+{'-' * self._nul[1]}+{'-' * self._def[1]}+{'-' * self._fk[1]}+"
 
         def print_column(self, column):
             _name = str(column.name)

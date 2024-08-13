@@ -56,3 +56,5 @@ export PYTHONPATH=${PWD}
 set +a
 env | grep POSTGRES_*
 python3 app/main.py
+
+

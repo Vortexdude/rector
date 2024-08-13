@@ -2,15 +2,18 @@ import os
 import jinja2
 from glob import glob
 from io import BytesIO
-from typing import List
+from typing import List, Callable
+from fastapi import Security
 from app.core.config import settings
+from fastapi.security import APIKeyHeader
+from app.common.utils.files import upload_file
 from starlette.templating import Jinja2Templates
-from app.api.models.ffmpeg import ExportQualities
 from starlette.responses import RedirectResponse
-from app.common.utils.files import upload_file, cleanup
+from app.api.models.ffmpeg import ExportQualities
 from app.api.services.ffmpeg.multimedia import Multiplexer
 from fastapi import APIRouter, File, UploadFile, Query, Request
 from fastapi.responses import HTMLResponse, StreamingResponse, FileResponse
+from functools import wraps
 
 templates = Jinja2Templates(directory="templates")
 playlist_template = jinja2.Environment(loader=jinja2.PackageLoader('data', 'playlist'), )
@@ -23,6 +26,11 @@ def server_bytes_as_file(contents: bytes) -> StreamingResponse:
     response.write(contents)
     response.seek(0)
     return StreamingResponse(response)
+
+
+@router.get("/auth-needed", tags=["auth-Authorization"])
+def auth_needed(auth=Security(APIKeyHeader(name="Authorization"))):
+    pass
 
 
 @router.post("/upload_video")
