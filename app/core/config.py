@@ -6,6 +6,7 @@ from functools import lru_cache
 from app.common.utils.log import Logger
 from .pathconf import BasePath, SQLITE_DATABASE_FILE
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from app.common.utils.parsers import check_db_connection
 
 
 load_dotenv()
@@ -25,10 +26,10 @@ class PostgresSecret(BaseSettings):
 class DATABASE:
     @property
     def uri(self) -> str:
-        if os.getenv("ENV") == 'development':
-            return SQLITE_DATABASE_FILE
-
         _pg: PostgresSecret = PostgresSecret()
+        if os.getenv("ENV") == 'development':
+            if not check_db_connection(db=_pg.db, password=_pg.password, host=_pg.host, user=_pg.user):
+                return SQLITE_DATABASE_FILE
 
         POSTGRES = {
             'user': _pg.user,

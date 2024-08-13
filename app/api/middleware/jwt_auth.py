@@ -38,7 +38,6 @@ class JWTAuthMiddleware(AuthenticationBackend):
         auth = request.headers.get("Authorization")
         if not auth:
             logger.warning(f"Token Header is missing from the request")
-            logger.error(f"Register router needs the auth header")
             raise _AuthenticateError(
                 code=StandardResponseCode.HTTP_401,
                 msg="Authentication header require",
